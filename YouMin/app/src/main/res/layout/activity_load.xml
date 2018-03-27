@@ -1,0 +1,63 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="fill_parent"
+    android:layout_height="fill_parent"
+    android:background="@mipmap/load_bg"
+    android:orientation="vertical" >
+
+    <TextView
+        android:id="@+id/copy_right"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignParentBottom="true"
+        android:layout_centerHorizontal="true"
+        android:padding="12dip"
+        android:text="Copyright © 2017-2018 tpzhu. All Rights Reserved."
+        android:textColor="@android:color/white"
+        android:textSize="11sp" />
+
+    <TextView
+        android:id="@+id/progressMsg"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:padding="6dip"
+        android:layout_above="@id/copy_right"
+        android:layout_centerInParent="true"
+        android:text=""
+        android:textColor="@color/white"
+        android:textSize="13sp" />
+
+    <ProgressBar
+        android:id="@+id/refresh_list_footer_progressbar"
+        android:layout_width="16dip"
+        android:layout_height="16dip"
+        android:layout_marginBottom="20dip"
+        android:indeterminate="true"
+        android:layout_centerInParent="true"
+        android:layout_above="@id/progressMsg"
+        android:indeterminateBehavior="repeat"
+        android:indeterminateDrawable="@drawable/load_loading" />
+
+    <!--<RelativeLayout-->
+        <!--android:layout_width="fill_parent"-->
+        <!--android:layout_height="fill_parent"-->
+        <!--android:layout_alignParentTop="true">-->
+        <!--<LinearLayout-->
+            <!--android:layout_width="wrap_content"-->
+            <!--android:layout_height="wrap_content"-->
+            <!--android:layout_centerHorizontal="true"-->
+            <!--android:layout_marginTop="50dp"-->
+            <!--android:orientation="vertical" >-->
+            <!--<RelativeLayout-->
+                <!--android:layout_width="wrap_content"-->
+                <!--android:layout_height="wrap_content"-->
+                <!--android:layout_gravity="center_horizontal">-->
+                <!--<ImageView-->
+                    <!--android:layout_width="200dp"-->
+                    <!--android:layout_height="200dp"-->
+                    <!--android:src="@mipmap/load_lv" />-->
+            <!--</RelativeLayout>-->
+
+        <!--</LinearLayout>-->
+    <!--</RelativeLayout>-->
+</RelativeLayout>

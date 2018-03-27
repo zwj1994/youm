@@ -1,0 +1,79 @@
+<?xml version="1.0" encoding="utf-8"?>
+<manifest xmlns:android="http://schemas.android.com/apk/res/android"
+    package="com.bs.youmin" >
+
+    <!-- To auto-complete the email text field in the login form with the user's emails -->
+    <uses-permission android:name="android.permission.GET_ACCOUNTS" />
+    <uses-permission android:name="android.permission.READ_PROFILE" />
+    <uses-permission android:name="android.permission.READ_CONTACTS" />
+    <uses-permission android:name="android.permission.ACCESS_WIFI_STATE"/>
+    <uses-permission android:name="android.permission.CHANGE_WIFI_STATE"/>
+    <uses-permission android:name="android.permission.INTERNET" />
+    <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
+    <uses-permission android:name="android.permission.READ_PHONE_STATE"/>
+    <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" />
+    <uses-permission android:name="android.permission.MOUNT_UNMOUNT_FILESYSTEMS" />
+    <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" />
+
+
+    <application
+        android:allowBackup="true"
+        android:icon="@mipmap/ic_launcher"
+        android:label="@string/app_name"
+        android:supportsRtl="true"
+        android:theme="@style/AppTheme" >
+        <activity
+            android:name=".activity.LoadActivity"
+            android:theme="@style/NoTitleFullscreen"
+            android:label="@string/app_name" >
+            <intent-filter>
+                <action android:name="android.intent.action.MAIN" />
+
+                <category android:name="android.intent.category.LAUNCHER" />
+            </intent-filter>
+        </activity>
+        <activity android:name=".activity.LoginActivity"/>
+        <activity
+            android:name=".activity.MainActivity"
+            android:label="@string/app_name"
+            android:theme="@style/AppTheme.NoActionBar"/>
+
+        <activity
+            android:name=".activity.SettingActivity"
+            android:label="@string/text_setting"/>
+
+        <activity android:name=".activity.SpecialActivity"/>
+
+        <activity android:name=".activity.AlbumRankingActivity"/>
+
+        <activity
+            android:name=".activity.GalleryActivity"
+            android:theme="@style/NoTitleFullscreen"/>
+
+        <activity
+            android:name=".activity.CityActivity"
+            android:label="@string/text_select_city"/>
+
+        <activity
+            android:name=".activity.AboutActivity"
+            android:label="@string/text_about"/>
+
+        <activity android:name=".activity.WebViewActivity"/>
+
+        <activity
+            android:name=".activity.AndroidVideoActivity"
+            android:label="@string/text_my_video"/>
+
+        <activity
+            android:name=".activity.SystemInformationActivity"
+            android:label="@string/text_system_information"/>
+
+        <activity
+            android:name=".activity.PuzzleGameActivity"
+            android:label="@string/text_game"/>
+
+        <activity android:name=".activity.PhoneListActivity"
+            android:label="@string/text_phone"/>
+    </application>
+
+</manifest>
