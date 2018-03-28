@@ -13,19 +13,16 @@ import android.widget.EditText;
 import android.widget.Toast;
 
 import com.bs.youmin.R;
-import com.bs.youmin.activity.LoadActivity;
 import com.bs.youmin.entity.Ip;
-import com.bs.youmin.entity.ResBody;
 import com.bs.youmin.entity.User;
-import com.bs.youmin.entity.YPhoto;
 import com.bs.youmin.imp.ApiImp;
+import com.bs.youmin.model.ResultModel;
+import com.bs.youmin.model.ResultStatus;
+import com.bs.youmin.model.TokenModel;
 import com.bs.youmin.util.L;
 import com.bs.youmin.util.SaveUserUtil;
 import com.bs.youmin.util.encryption.des.AndroidDes3Util;
 
-import java.util.List;
-
-import Decoder.BASE64Encoder;
 import retrofit2.Call;
 import retrofit2.Callback;
 import retrofit2.Response;
@@ -45,6 +42,7 @@ public class LoginFragment extends Fragment {
     private Button login_btn;
     private EditText login_input_password;
     private EditText login_input_username;
+    private Button forgive_pwd;
     private ApiImp apiImp;
 
     @Override
@@ -58,7 +56,7 @@ public class LoginFragment extends Fragment {
         login_btn = (Button) view.findViewById(R.id.login_btn);
         login_input_username = (EditText) view.findViewById(R.id.login_input_username);
         login_input_password = (EditText) view.findViewById(R.id.login_input_password);
-
+        forgive_pwd = (Button) view.findViewById(R.id.forgive_pwd);
         login_btn.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
@@ -74,7 +72,7 @@ public class LoginFragment extends Fragment {
                     showInput(login_input_password);
                     return;
                 }
-                User user = SaveUserUtil.loadAccount(getActivity());
+                final User user = SaveUserUtil.loadAccount(getActivity());
                 Retrofit retrofit = new Retrofit.Builder().baseUrl(Ip.SERVER_URL)
                         .addConverterFactory(GsonConverterFactory.create()).build();
                 apiImp = retrofit.create(ApiImp.class);
@@ -84,24 +82,57 @@ public class LoginFragment extends Fragment {
                 } catch (Exception e) {
                     e.printStackTrace();
                 }
-                Call<ResBody> call = apiImp.login(user.getIdentifier(), username,password);
+                Call<ResultModel<TokenModel>> call = apiImp.login(user.getIdentifier(), username,password);
                 //请求数据
-                call.enqueue(new Callback<ResBody>() {
+                call.enqueue(new Callback<ResultModel<TokenModel>>() {
                     @Override
-                    public void onResponse(Call<ResBody> call, Response<ResBody> response) {
+                    public void onResponse(Call<ResultModel<TokenModel>> call, Response<ResultModel<TokenModel>> response) {
                         if (response.isSuccessful()) {
-                            if("200".equals(response.body().getCode())){
-                                Toast.makeText(getActivity(), "登录成功",Toast.LENGTH_SHORT).show();
-                            }else if("404".equals(response.body().getCode())){
-                                Toast.makeText(getActivity(), "登录失败，您还没有绑定服务器",Toast.LENGTH_SHORT).show();
+                            ResultModel resultModel =  response.body();
+                            if(ResultStatus.SUCCESS.getCode() == response.body().getCode()){
+                                TokenModel tokenModel = response.body().getContent();
+                                user.setToken(tokenModel.getToken());
+                                L.i("token="+tokenModel.getToken());
+                                SaveUserUtil.saveAccount(getActivity(),user);
+                                Toast.makeText(getActivity(), resultModel.getMessage(),Toast.LENGTH_SHORT).show();
                             }else{
-                                Toast.makeText(getActivity(), "登录失败，服务器发烧了",Toast.LENGTH_SHORT).show();
+                                Toast.makeText(getActivity(), resultModel.getMessage(),Toast.LENGTH_SHORT).show();
                             }
                         }
                     }
                     @Override
-                    public void onFailure(Call<ResBody> call, Throwable t) {
-                        Toast.makeText(getActivity(), t.toString(),Toast.LENGTH_SHORT).show();
+                    public void onFailure(Call<ResultModel<TokenModel>> call, Throwable t) {
+                        Toast.makeText(getActivity(), "请求失败，请稍后再试",Toast.LENGTH_SHORT).show();
+                        L.i(t.toString());
+                    }
+                });
+            }
+        });
+
+        forgive_pwd.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                Toast.makeText(getActivity(), "登出开始",Toast.LENGTH_SHORT).show();
+                final User user = SaveUserUtil.loadAccount(getActivity());
+                Retrofit retrofit = new Retrofit.Builder().baseUrl(Ip.SERVER_URL)
+                        .addConverterFactory(GsonConverterFactory.create()).build();
+                apiImp = retrofit.create(ApiImp.class);
+                Call<ResultModel<TokenModel>> call = apiImp.logout(user.getUsername()+"_"+user.getKey());
+                //请求数据
+                call.enqueue(new Callback<ResultModel<TokenModel>>() {
+                    @Override
+                    public void onResponse(Call<ResultModel<TokenModel>> call, Response<ResultModel<TokenModel>> response) {
+                        Toast.makeText(getActivity(), "登出成功",Toast.LENGTH_SHORT).show();
+                        Toast.makeText(getActivity(), response.isSuccessful()+"",Toast.LENGTH_SHORT).show();
+                        if (response.isSuccessful()) {
+                            if(ResultStatus.SUCCESS.getCode() == response.body().getCode()){
+                                Toast.makeText(getActivity(), "登出成功",Toast.LENGTH_SHORT).show();
+                            }
+                        }
+                    }
+                    @Override
+                    public void onFailure(Call<ResultModel<TokenModel>> call, Throwable t) {
+                        Toast.makeText(getActivity(), "请求失败，请稍后再试",Toast.LENGTH_SHORT).show();
                         L.i(t.toString());
                     }
                 });

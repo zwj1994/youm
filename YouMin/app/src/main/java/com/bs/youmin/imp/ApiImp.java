@@ -2,6 +2,7 @@ package com.bs.youmin.imp;
 
 
 
+import com.bs.youmin.entity.Constants;
 import com.bs.youmin.entity.ResBody;
 import com.bs.youmin.entity.WallpaperApiModel;
 import com.bs.youmin.entity.WeatherApiModel;
@@ -9,11 +10,16 @@ import com.bs.youmin.entity.WeatherEveryDayApiModel;
 import com.bs.youmin.entity.WeatherLifeApiModel;
 import com.bs.youmin.entity.YAlbum;
 import com.bs.youmin.entity.YPhoto;
+import com.bs.youmin.entity.YUser;
+import com.bs.youmin.model.ResultModel;
+import com.bs.youmin.model.TokenModel;
 
 import java.util.List;
 
 import retrofit2.Call;
+import retrofit2.http.DELETE;
 import retrofit2.http.GET;
+import retrofit2.http.Header;
 import retrofit2.http.POST;
 import retrofit2.http.Query;
 
@@ -36,14 +42,21 @@ public interface ApiImp {
     Call<List<YPhoto>> getAlbumPhoto(@Query("aId")String aId,@Query("page")int page);
 
     /**
-     * 获取相册内照片
+     * 登录
      * @param identifier
      * @param username
      * @param password
      * @return
      */
     @POST("sys/login")
-    Call<ResBody> login(@Query("identifier")String identifier, @Query("username")String username, @Query("password")String password);
+    Call<ResultModel<TokenModel>> login(@Query("identifier")String identifier, @Query("username")String username, @Query("password")String password);
+
+    /**
+     * 登出
+     * @return
+     */
+    @DELETE("sys/logout")
+    Call<ResultModel<TokenModel>> logout(@Header("authorization") String authorization);
 
     //获取爱壁纸接口
     @GET("category/homePage")
