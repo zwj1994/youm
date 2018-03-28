@@ -2,6 +2,7 @@ package com.bs.youmin.imp;
 
 
 
+import com.bs.youmin.entity.ResBody;
 import com.bs.youmin.entity.WallpaperApiModel;
 import com.bs.youmin.entity.WeatherApiModel;
 import com.bs.youmin.entity.WeatherEveryDayApiModel;
@@ -13,6 +14,7 @@ import java.util.List;
 
 import retrofit2.Call;
 import retrofit2.http.GET;
+import retrofit2.http.POST;
 import retrofit2.http.Query;
 
 public interface ApiImp {
@@ -32,6 +34,16 @@ public interface ApiImp {
      */
     @GET("yalbum/photo")
     Call<List<YPhoto>> getAlbumPhoto(@Query("aId")String aId,@Query("page")int page);
+
+    /**
+     * 获取相册内照片
+     * @param identifier
+     * @param username
+     * @param password
+     * @return
+     */
+    @POST("sys/login")
+    Call<ResBody> login(@Query("identifier")String identifier, @Query("username")String username, @Query("password")String password);
 
     //获取爱壁纸接口
     @GET("category/homePage")

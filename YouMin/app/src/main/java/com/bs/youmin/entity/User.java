@@ -29,6 +29,16 @@ public class User implements Serializable {
 
     private String identifier;
 
+    private String token;
+
+    public String getToken() {
+        return token;
+    }
+
+    public void setToken(String token) {
+        this.token = token;
+    }
+
     public String getIdentifier() {
         return identifier;
     }

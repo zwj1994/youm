@@ -12,6 +12,7 @@ import android.support.v4.widget.DrawerLayout;
 import android.support.v7.app.ActionBarDrawerToggle;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
+import android.text.TextUtils;
 import android.view.Gravity;
 import android.view.Menu;
 import android.view.MenuItem;
@@ -20,11 +21,16 @@ import android.widget.LinearLayout;
 
 import com.bs.youmin.R;
 import com.bs.youmin.entity.Constants;
+import com.bs.youmin.entity.User;
 import com.bs.youmin.fragment.AlbumRankingFragment;
 import com.bs.youmin.fragment.HomePageFragment;
+import com.bs.youmin.fragment.LoginFragment;
 import com.bs.youmin.fragment.RankingFragment;
 import com.bs.youmin.fragment.WeatherFragment;
+import com.bs.youmin.util.SaveUserUtil;
 import com.bs.youmin.view.CustomDialog;
+
+import de.hdodenhof.circleimageview.CircleImageView;
 
 
 public class MainActivity extends AppCompatActivity implements NavigationView.OnNavigationItemSelectedListener, View.OnClickListener {
@@ -35,6 +41,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
     private AlbumRankingFragment albumRankingFragment;
     private RankingFragment rankingFragment;
     private WeatherFragment weatherFragment;
+    private LoginFragment loginFragment;
 
     private CustomDialog dialogShare;
     private LinearLayout ll_share_qq;
@@ -52,7 +59,6 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
 
     @SuppressLint("NewApi")
     private void initView() {
-
         dialogShare = new CustomDialog(this, 0, 0, R.layout.dialog_share_item, R.style.Theme_dialog, Gravity.BOTTOM, R.style.pop_anim_style);
         ll_share_qq = (LinearLayout) dialogShare.findViewById(R.id.ll_share_qq);
         ll_share_qq.setOnClickListener(this);
@@ -89,7 +95,11 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
                 initAlbumRanking();
                 break;
             case R.id.nav_ranking:
-                initRanking();
+                User user = SaveUserUtil.loadAccount(MainActivity.this);
+                if(null == user || TextUtils.isEmpty(user.getToken()))
+                    initLogin();
+                else
+                    initRanking();
                 break;
             case R.id.nav_weather:
                 initWeather();
@@ -141,6 +151,23 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
             startActivity(new Intent(this, SettingActivity.class));
         }
         return super.onOptionsItemSelected(item);
+    }
+
+    /**
+     * 登录
+     */
+    private void initLogin(){
+        getSupportActionBar().setTitle(getString(R.string.text_login));
+        FragmentTransaction transaction = getSupportFragmentManager().beginTransaction();
+        if (loginFragment == null) {
+            loginFragment = new LoginFragment();
+            transaction.add(R.id.main_frame_layout, loginFragment);
+        }
+        //隐藏所有fragment
+        hideFragment(transaction);
+        //显示需要显示的fragment
+        transaction.show(loginFragment);
+        transaction.commit();
     }
 
     //首页
