@@ -58,6 +58,14 @@ public interface ApiImp {
     @DELETE("sys/logout")
     Call<ResultModel<TokenModel>> logout(@Header("authorization") String authorization);
 
+    /**
+     * 获取我的相册
+     * @param page
+     * @return
+     */
+    @GET("yalbum/myAlbum")
+    Call<List<YAlbum>> getMyAlbum(@Query("page")int page,@Header("authorization") String authorization);
+
     //获取爱壁纸接口
     @GET("category/homePage")
     Call<WallpaperApiModel> getHomePage();

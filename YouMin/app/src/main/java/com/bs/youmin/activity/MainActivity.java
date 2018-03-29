@@ -4,6 +4,8 @@ import android.annotation.SuppressLint;
 import android.app.AlertDialog;
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
 import android.os.Bundle;
 import android.support.design.widget.NavigationView;
 import android.support.v4.app.FragmentTransaction;
@@ -18,6 +20,8 @@ import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.LinearLayout;
+import android.widget.TextView;
+import android.widget.Toast;
 
 import com.bs.youmin.R;
 import com.bs.youmin.entity.Constants;
@@ -25,10 +29,14 @@ import com.bs.youmin.entity.User;
 import com.bs.youmin.fragment.AlbumRankingFragment;
 import com.bs.youmin.fragment.HomePageFragment;
 import com.bs.youmin.fragment.LoginFragment;
+import com.bs.youmin.fragment.MyAlbumFragment;
 import com.bs.youmin.fragment.RankingFragment;
 import com.bs.youmin.fragment.WeatherFragment;
+import com.bs.youmin.util.L;
 import com.bs.youmin.util.SaveUserUtil;
 import com.bs.youmin.view.CustomDialog;
+
+import java.net.URL;
 
 import de.hdodenhof.circleimageview.CircleImageView;
 
@@ -39,6 +47,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
 
     private HomePageFragment homePageFragment;
     private AlbumRankingFragment albumRankingFragment;
+    private MyAlbumFragment myAlbumFragment;
     private RankingFragment rankingFragment;
     private WeatherFragment weatherFragment;
     private LoginFragment loginFragment;
@@ -48,6 +57,11 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
     private LinearLayout ll_share_sina;
     private LinearLayout ll_share_wechat;
     private LinearLayout ll_share_more;
+
+    private CircleImageView user_header_img;
+    private TextView login_msg;
+    private TextView user_sign;
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -79,6 +93,11 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         toggle.syncState();
 
         NavigationView navigationView = (NavigationView) findViewById(R.id.nav_view);
+        View view = navigationView.getHeaderView(0);
+        user_header_img = (CircleImageView)view.findViewById(R.id.user_header_img);
+        login_msg = (TextView) view.findViewById(R.id.login_msg);
+        user_sign = (TextView) view.findViewById(R.id.user_sign);
+
         navigationView.setNavigationItemSelectedListener(this);
         //显示原本的色彩
         navigationView.setItemIconTintList(null);
@@ -94,12 +113,13 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
             case R.id.nav_album_ranking:
                 initAlbumRanking();
                 break;
-            case R.id.nav_ranking:
-                User user = SaveUserUtil.loadAccount(MainActivity.this);
-                if(null == user || TextUtils.isEmpty(user.getToken()))
-                    initLogin();
-                else
-                    initRanking();
+            case R.id.nav_my_album:
+                initMyAlbum();
+//                User user = SaveUserUtil.loadAccount(MainActivity.this);
+//                if(null == user || TextUtils.isEmpty(user.getToken()))
+//                    initLogin();
+//                else
+//                    initMyAlbum();
                 break;
             case R.id.nav_weather:
                 initWeather();
@@ -163,11 +183,32 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
             loginFragment = new LoginFragment();
             transaction.add(R.id.main_frame_layout, loginFragment);
         }
+        loginFragment.setOnButtonClick(new LoginFragment.OnButtonClick() {
+            //3、实现接口对象的方法，
+            @Override
+            public void onClick(View view) {
+                initMyAlbum();
+                initUserInfo();
+            }
+        });
         //隐藏所有fragment
         hideFragment(transaction);
         //显示需要显示的fragment
         transaction.show(loginFragment);
         transaction.commit();
+    }
+
+    /**
+     * 初始化用户信息
+     */
+    private void initUserInfo(){
+        try{
+            final User user = SaveUserUtil.loadAccount(MainActivity.this);
+            user_sign.setText(user.getSign());
+            login_msg.setText(user.getHeaderImg());
+        }catch (Exception e){
+            e.printStackTrace();
+        }
     }
 
     //首页
@@ -185,7 +226,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         transaction.commit();
     }
 
-    //相册排名
+    //排名
     private void initAlbumRanking() {
         getSupportActionBar().setTitle(getString(R.string.text_album_ranking));
         FragmentTransaction transaction = getSupportFragmentManager().beginTransaction();
@@ -200,9 +241,31 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         transaction.commit();
     }
 
-    //排名
+    //我的
+    private void initMyAlbum() {
+        getSupportActionBar().setTitle(getString(R.string.text_my_album));
+        FragmentTransaction transaction = getSupportFragmentManager().beginTransaction();
+        if (myAlbumFragment == null) {
+            myAlbumFragment = new MyAlbumFragment();
+            transaction.add(R.id.main_frame_layout, myAlbumFragment);
+        }
+        myAlbumFragment.setOnButtonClick(new LoginFragment.OnButtonClick() {
+            //3、实现接口对象的方法，
+            @Override
+            public void onClick(View view) {
+                initLogin();
+            }
+        });
+        //隐藏所有fragment
+        hideFragment(transaction);
+        //显示需要显示的fragment
+        transaction.show(myAlbumFragment);
+        transaction.commit();
+    }
+
+    //我的
     private void initRanking() {
-        getSupportActionBar().setTitle(getString(R.string.text_ranking));
+        getSupportActionBar().setTitle(getString(R.string.text_my_album));
         FragmentTransaction transaction = getSupportFragmentManager().beginTransaction();
         if (rankingFragment == null) {
             rankingFragment = new RankingFragment();
@@ -233,6 +296,9 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
 
     //隐藏所有Fragment
     private void hideFragment(FragmentTransaction transaction) {
+        if (myAlbumFragment != null) {
+            transaction.hide(myAlbumFragment);
+        }
         if (homePageFragment != null) {
             transaction.hide(homePageFragment);
         }
@@ -244,6 +310,9 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         }
         if (weatherFragment != null) {
             transaction.hide(weatherFragment);
+        }
+        if (loginFragment != null) {
+            transaction.hide(loginFragment);
         }
     }
 

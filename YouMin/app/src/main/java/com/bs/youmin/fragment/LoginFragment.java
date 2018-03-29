@@ -3,6 +3,7 @@ package com.bs.youmin.fragment;
 import android.content.Context;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
+import android.support.v4.app.FragmentTransaction;
 import android.text.TextUtils;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -44,7 +45,7 @@ public class LoginFragment extends Fragment {
     private EditText login_input_username;
     private Button forgive_pwd;
     private ApiImp apiImp;
-
+    private OnButtonClick onButtonClick;//2、定义接口成员变量
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.activity_login, container, false);
@@ -92,9 +93,15 @@ public class LoginFragment extends Fragment {
                             if(ResultStatus.SUCCESS.getCode() == response.body().getCode()){
                                 TokenModel tokenModel = response.body().getContent();
                                 user.setToken(tokenModel.getToken());
-                                L.i("token="+tokenModel.getToken());
+                                user.setUsername(tokenModel.getUserId());
+                                user.setHeaderImg(tokenModel.getHeaderImg());
+                                user.setSign(tokenModel.getSign());
                                 SaveUserUtil.saveAccount(getActivity(),user);
                                 Toast.makeText(getActivity(), resultModel.getMessage(),Toast.LENGTH_SHORT).show();
+
+                                if(onButtonClick!=null){
+                                    onButtonClick.onClick(login_btn);
+                                }
                             }else{
                                 Toast.makeText(getActivity(), resultModel.getMessage(),Toast.LENGTH_SHORT).show();
                             }
@@ -112,18 +119,15 @@ public class LoginFragment extends Fragment {
         forgive_pwd.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                Toast.makeText(getActivity(), "登出开始",Toast.LENGTH_SHORT).show();
                 final User user = SaveUserUtil.loadAccount(getActivity());
                 Retrofit retrofit = new Retrofit.Builder().baseUrl(Ip.SERVER_URL)
                         .addConverterFactory(GsonConverterFactory.create()).build();
                 apiImp = retrofit.create(ApiImp.class);
-                Call<ResultModel<TokenModel>> call = apiImp.logout(user.getUsername()+"_"+user.getKey());
+                Call<ResultModel<TokenModel>> call = apiImp.logout(user.getUsername()+"_"+user.getToken());
                 //请求数据
                 call.enqueue(new Callback<ResultModel<TokenModel>>() {
                     @Override
                     public void onResponse(Call<ResultModel<TokenModel>> call, Response<ResultModel<TokenModel>> response) {
-                        Toast.makeText(getActivity(), "登出成功",Toast.LENGTH_SHORT).show();
-                        Toast.makeText(getActivity(), response.isSuccessful()+"",Toast.LENGTH_SHORT).show();
                         if (response.isSuccessful()) {
                             if(ResultStatus.SUCCESS.getCode() == response.body().getCode()){
                                 Toast.makeText(getActivity(), "登出成功",Toast.LENGTH_SHORT).show();
@@ -148,6 +152,18 @@ public class LoginFragment extends Fragment {
         view.requestFocus();
         InputMethodManager imm = (InputMethodManager)getActivity().getSystemService(Context.INPUT_METHOD_SERVICE);
         imm.showSoftInput(view,0);
+    }
+    //定义接口变量的get方法
+    public OnButtonClick getOnButtonClick() {
+        return onButtonClick;
+    }
+    //定义接口变量的set方法
+    public void setOnButtonClick(OnButtonClick onButtonClick) {
+        this.onButtonClick = onButtonClick;
+    }
+    //1、定义接口
+    public interface OnButtonClick{
+        public void onClick(View view);
     }
 
 

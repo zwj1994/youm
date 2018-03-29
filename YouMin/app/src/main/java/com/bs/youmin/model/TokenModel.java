@@ -13,9 +13,29 @@ public class TokenModel {
     //随机生成的uuid
     private String token;
 
+    private String headerImg;
+
+    private String sign;
+
     public TokenModel(String userId, String token) {
         this.userId = userId;
         this.token = token;
+    }
+
+    public String getHeaderImg() {
+        return headerImg;
+    }
+
+    public void setHeaderImg(String headerImg) {
+        this.headerImg = headerImg;
+    }
+
+    public String getSign() {
+        return sign;
+    }
+
+    public void setSign(String sign) {
+        this.sign = sign;
     }
 
     public String getUserId() {

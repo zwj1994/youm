@@ -11,6 +11,7 @@ import android.widget.AdapterView;
 import android.widget.GridView;
 import android.widget.LinearLayout;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.bs.youmin.R;
 import com.bs.youmin.adapter.AlbumRankingDataAdapter;
@@ -18,8 +19,16 @@ import com.bs.youmin.entity.Ip;
 import com.bs.youmin.entity.YPhoto;
 import com.bs.youmin.imp.ApiImp;
 import com.bs.youmin.util.L;
+import com.google.gson.Gson;
+import com.google.gson.GsonBuilder;
+import com.google.gson.JsonDeserializationContext;
+import com.google.gson.JsonDeserializer;
+import com.google.gson.JsonElement;
+import com.google.gson.JsonParseException;
 
+import java.lang.reflect.Type;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 
 import retrofit2.Call;
@@ -125,8 +134,16 @@ public class AlbumRankingActivity extends BaseActivity {
      */
     private void loadData(final boolean loadFirst) {
         page++;
+
+        GsonBuilder builder = new GsonBuilder();
+        builder.registerTypeAdapter(Date.class, new JsonDeserializer<Date>() {
+            public Date deserialize(JsonElement json, Type typeOfT, JsonDeserializationContext context) throws JsonParseException {
+                return new Date(json.getAsJsonPrimitive().getAsLong());
+            }
+        });
+        Gson gson = builder.create();
         Retrofit retrofit = new Retrofit.Builder().baseUrl(Ip.SERVER_URL)
-                .addConverterFactory(GsonConverterFactory.create()).build();
+                .addConverterFactory(GsonConverterFactory.create(gson)).build();
         apiImp = retrofit.create(ApiImp.class);
         Call<List<YPhoto>> call = apiImp.getAlbumPhoto(aId,page);
         //请求数据
@@ -151,6 +168,7 @@ public class AlbumRankingActivity extends BaseActivity {
 
             @Override
             public void onFailure(Call<List<YPhoto>> call, Throwable t) {
+                t.printStackTrace();
                 L.i(t.toString());
             }
         });

@@ -31,6 +31,26 @@ public class User implements Serializable {
 
     private String token;
 
+    private String headerImg;
+
+    private String sign;
+
+    public String getHeaderImg() {
+        return headerImg;
+    }
+
+    public void setHeaderImg(String headerImg) {
+        this.headerImg = headerImg;
+    }
+
+    public String getSign() {
+        return sign;
+    }
+
+    public void setSign(String sign) {
+        this.sign = sign;
+    }
+
     public String getToken() {
         return token;
     }
@@ -87,6 +107,9 @@ public class User implements Serializable {
                 ", publicKey='" + publicKey + '\'' +
                 ", key='" + key + '\'' +
                 ", identifier='" + identifier + '\'' +
+                ", token='" + token + '\'' +
+                ", headerImg='" + headerImg + '\'' +
+                ", sign='" + sign + '\'' +
                 '}';
     }
 }
