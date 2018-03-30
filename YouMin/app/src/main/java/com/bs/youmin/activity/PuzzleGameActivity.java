@@ -8,10 +8,7 @@ package com.bs.youmin.activity;
  *  描述：    拼图游戏
  */
 
-import android.content.Context;
 import android.os.Bundle;
-import android.view.View;
-
 import com.bs.youmin.R;
 
 

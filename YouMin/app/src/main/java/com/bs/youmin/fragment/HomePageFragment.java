@@ -1,10 +1,10 @@
 package com.bs.youmin.fragment;
 /*
- *  项目名：  LoveWallpaper 
- *  包名：    com.liuguilin.lovewallpaper.fragment
+ *  项目名：  YouMin
+ *  包名：    com.bs.youmin.fragment
  *  文件名:   HomePageFragment
- *  创建者:   LGL
- *  创建时间:  2017/1/10 9:37
+ *  创建者:   ZWJ
+ *  创建时间:  2018/03/30 9:37
  *  描述：    首页
  */
 
@@ -59,7 +59,9 @@ public class HomePageFragment extends Fragment {
     private MainGridAdapter mainGridAdapter;
     private ScrollView mScrollView;
 
-    //轮播
+    /**
+     * 轮播
+     */
     public Handler mHandler = new Handler() {
         @Override
         public void handleMessage(Message msg) {
@@ -85,6 +87,10 @@ public class HomePageFragment extends Fragment {
         return view;
     }
 
+    /**
+     * 初始化视图
+     * @param view
+     */
     private void initView(View view) {
 
         mViewPager = (ViewPager) view.findViewById(R.id.mViewPager);

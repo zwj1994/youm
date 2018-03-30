@@ -4,8 +4,6 @@ import android.annotation.SuppressLint;
 import android.app.AlertDialog;
 import android.content.DialogInterface;
 import android.content.Intent;
-import android.graphics.Bitmap;
-import android.graphics.BitmapFactory;
 import android.os.Bundle;
 import android.support.design.widget.NavigationView;
 import android.support.v4.app.FragmentTransaction;
@@ -14,9 +12,7 @@ import android.support.v4.widget.DrawerLayout;
 import android.support.v7.app.ActionBarDrawerToggle;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
-import android.text.TextUtils;
 import android.view.Gravity;
-import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.LinearLayout;
@@ -30,13 +26,9 @@ import com.bs.youmin.fragment.AlbumRankingFragment;
 import com.bs.youmin.fragment.HomePageFragment;
 import com.bs.youmin.fragment.LoginFragment;
 import com.bs.youmin.fragment.MyAlbumFragment;
-import com.bs.youmin.fragment.RankingFragment;
 import com.bs.youmin.fragment.WeatherFragment;
-import com.bs.youmin.util.L;
 import com.bs.youmin.util.SaveUserUtil;
 import com.bs.youmin.view.CustomDialog;
-
-import java.net.URL;
 
 import de.hdodenhof.circleimageview.CircleImageView;
 
@@ -48,7 +40,6 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
     private HomePageFragment homePageFragment;
     private AlbumRankingFragment albumRankingFragment;
     private MyAlbumFragment myAlbumFragment;
-    private RankingFragment rankingFragment;
     private WeatherFragment weatherFragment;
     private LoginFragment loginFragment;
 
@@ -67,7 +58,6 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
-
         initView();
     }
 
@@ -115,11 +105,6 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
                 break;
             case R.id.nav_my_album:
                 initMyAlbum();
-//                User user = SaveUserUtil.loadAccount(MainActivity.this);
-//                if(null == user || TextUtils.isEmpty(user.getToken()))
-//                    initLogin();
-//                else
-//                    initMyAlbum();
                 break;
             case R.id.nav_weather:
                 initWeather();
@@ -146,9 +131,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
                     .setMessage("是否退出应用？")
                     .setNegativeButton("取消", new DialogInterface.OnClickListener() {
                         @Override
-                        public void onClick(DialogInterface dialogInterface, int i) {
-
-                        }
+                        public void onClick(DialogInterface dialogInterface, int i) {}
                     }).setPositiveButton("确定", new DialogInterface.OnClickListener() {
                 @Override
                 public void onClick(DialogInterface dialogInterface, int i) {
@@ -158,20 +141,20 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         }
     }
 
-    @Override
-    public boolean onCreateOptionsMenu(Menu menu) {
+//    @Override
+//    public boolean onCreateOptionsMenu(Menu menu) {
 //        getMenuInflater().inflate(R.menu.main, menu);//头部右侧点点点
-        return true;
-    }
+//        return true;
+//    }
 
-    @Override
-    public boolean onOptionsItemSelected(MenuItem item) {
-        int id = item.getItemId();
-        if (id == R.id.action_settings) {
-            startActivity(new Intent(this, SettingActivity.class));
-        }
-        return super.onOptionsItemSelected(item);
-    }
+//    @Override
+//    public boolean onOptionsItemSelected(MenuItem item) {
+//        int id = item.getItemId();
+//        if (id == R.id.action_settings) {
+//            startActivity(new Intent(this, SettingActivity.class));
+//        }
+//        return super.onOptionsItemSelected(item);
+//    }
 
     /**
      * 登录
@@ -211,8 +194,11 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         }
     }
 
-    //首页
+    /**
+     * 首页
+     */
     private void initHomePager() {
+        Toast.makeText(MainActivity.this, "首页"+homePageFragment,Toast.LENGTH_SHORT).show();
         getSupportActionBar().setTitle(getString(R.string.app_name));
         FragmentTransaction transaction = getSupportFragmentManager().beginTransaction();
         if (homePageFragment == null) {
@@ -226,8 +212,11 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         transaction.commit();
     }
 
-    //排名
+    /**
+     * 排名
+     */
     private void initAlbumRanking() {
+        Toast.makeText(MainActivity.this, "排名"+albumRankingFragment,Toast.LENGTH_SHORT).show();
         getSupportActionBar().setTitle(getString(R.string.text_album_ranking));
         FragmentTransaction transaction = getSupportFragmentManager().beginTransaction();
         if (albumRankingFragment == null) {
@@ -241,8 +230,11 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         transaction.commit();
     }
 
-    //我的
+    /**
+     * 我的
+     */
     private void initMyAlbum() {
+        Toast.makeText(MainActivity.this, "我的"+myAlbumFragment,Toast.LENGTH_SHORT).show();
         getSupportActionBar().setTitle(getString(R.string.text_my_album));
         FragmentTransaction transaction = getSupportFragmentManager().beginTransaction();
         if (myAlbumFragment == null) {
@@ -254,6 +246,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
             @Override
             public void onClick(View view) {
                 initLogin();
+                myAlbumFragment = null;
             }
         });
         //隐藏所有fragment
@@ -263,24 +256,11 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         transaction.commit();
     }
 
-    //我的
-    private void initRanking() {
-        getSupportActionBar().setTitle(getString(R.string.text_my_album));
-        FragmentTransaction transaction = getSupportFragmentManager().beginTransaction();
-        if (rankingFragment == null) {
-            rankingFragment = new RankingFragment();
-            transaction.add(R.id.main_frame_layout, rankingFragment);
-        }
-        //隐藏所有fragment
-        hideFragment(transaction);
-        //显示需要显示的fragment
-        transaction.show(rankingFragment);
-        transaction.commit();
-    }
-
-
-    //天气
+    /**
+     * 天气
+     */
     private void initWeather() {
+        Toast.makeText(MainActivity.this, "天气"+weatherFragment,Toast.LENGTH_SHORT).show();
         getSupportActionBar().setTitle(getString(R.string.text_weather));
         FragmentTransaction transaction = getSupportFragmentManager().beginTransaction();
         if (weatherFragment == null) {
@@ -294,7 +274,10 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         transaction.commit();
     }
 
-    //隐藏所有Fragment
+    /**
+     * 隐藏所有Fragment
+     * @param transaction
+     */
     private void hideFragment(FragmentTransaction transaction) {
         if (myAlbumFragment != null) {
             transaction.hide(myAlbumFragment);
@@ -305,9 +288,6 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         if (albumRankingFragment != null) {
             transaction.hide(albumRankingFragment);
         }
-        if (rankingFragment != null) {
-            transaction.hide(rankingFragment);
-        }
         if (weatherFragment != null) {
             transaction.hide(weatherFragment);
         }
@@ -316,11 +296,9 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         }
     }
 
-    //点击事件
     @Override
     public void onClick(View view) {
         switch (view.getId()) {
-            //分享目前就用原生的 后期加入第三方分享
             case R.id.ll_share_qq:
                 Constants.intentStartQQ(this, Constants.shareText);
                 break;
