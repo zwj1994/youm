@@ -198,7 +198,6 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
      * 首页
      */
     private void initHomePager() {
-        Toast.makeText(MainActivity.this, "首页"+homePageFragment,Toast.LENGTH_SHORT).show();
         getSupportActionBar().setTitle(getString(R.string.app_name));
         FragmentTransaction transaction = getSupportFragmentManager().beginTransaction();
         if (homePageFragment == null) {
@@ -216,7 +215,6 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
      * 排名
      */
     private void initAlbumRanking() {
-        Toast.makeText(MainActivity.this, "排名"+albumRankingFragment,Toast.LENGTH_SHORT).show();
         getSupportActionBar().setTitle(getString(R.string.text_album_ranking));
         FragmentTransaction transaction = getSupportFragmentManager().beginTransaction();
         if (albumRankingFragment == null) {
@@ -234,7 +232,6 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
      * 我的
      */
     private void initMyAlbum() {
-        Toast.makeText(MainActivity.this, "我的"+myAlbumFragment,Toast.LENGTH_SHORT).show();
         getSupportActionBar().setTitle(getString(R.string.text_my_album));
         FragmentTransaction transaction = getSupportFragmentManager().beginTransaction();
         if (myAlbumFragment == null) {
@@ -260,7 +257,6 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
      * 天气
      */
     private void initWeather() {
-        Toast.makeText(MainActivity.this, "天气"+weatherFragment,Toast.LENGTH_SHORT).show();
         getSupportActionBar().setTitle(getString(R.string.text_weather));
         FragmentTransaction transaction = getSupportFragmentManager().beginTransaction();
         if (weatherFragment == null) {

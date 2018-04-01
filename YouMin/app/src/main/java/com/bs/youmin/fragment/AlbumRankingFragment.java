@@ -76,6 +76,7 @@ public class AlbumRankingFragment extends Fragment {
         mListView.setOnScrollListener(new AbsListView.OnScrollListener() {
             @Override
             public void onScrollStateChanged(AbsListView absListView, int i) {
+                L.i("============="+i);
                 if (i == AbsListView.OnScrollListener.SCROLL_STATE_IDLE) {
                     if (mListView.getLastVisiblePosition() == mListView.getCount() - 1) {
                         ranking_load_more_tv.setText(getString(R.string.progressbar_load_more));

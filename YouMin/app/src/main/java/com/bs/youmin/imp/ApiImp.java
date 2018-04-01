@@ -2,15 +2,13 @@ package com.bs.youmin.imp;
 
 
 
-import com.bs.youmin.entity.Constants;
-import com.bs.youmin.entity.ResBody;
 import com.bs.youmin.entity.WallpaperApiModel;
 import com.bs.youmin.entity.WeatherApiModel;
 import com.bs.youmin.entity.WeatherEveryDayApiModel;
 import com.bs.youmin.entity.WeatherLifeApiModel;
 import com.bs.youmin.entity.YAlbum;
+import com.bs.youmin.entity.YBanner;
 import com.bs.youmin.entity.YPhoto;
-import com.bs.youmin.entity.YUser;
 import com.bs.youmin.model.ResultModel;
 import com.bs.youmin.model.TokenModel;
 
@@ -30,7 +28,7 @@ public interface ApiImp {
      * @param page
      * @return
      */
-    @GET("yalbum/ranking")
+    @POST("yalbum/ranking")
     Call<List<YAlbum>> getAlbumRanking(@Query("page")int page);
 
     /**
@@ -38,7 +36,7 @@ public interface ApiImp {
      * @param aId
      * @return
      */
-    @GET("yalbum/photo")
+    @POST("yalbum/photo")
     Call<List<YPhoto>> getAlbumPhoto(@Query("aId")String aId,@Query("page")int page);
 
     /**
@@ -63,8 +61,23 @@ public interface ApiImp {
      * @param page
      * @return
      */
-    @GET("yalbum/myAlbum")
+    @POST("yalbum/myAlbum")
     Call<List<YAlbum>> getMyAlbum(@Query("page")int page,@Header("authorization") String authorization);
+
+    /**
+     * 获取首页轮播图
+     * @return
+     */
+    @POST("sys/getBanner")
+    Call<List<YBanner>> getBanner();
+
+    /**
+     * 获取所有公开的相册
+     * @param page
+     * @return
+     */
+    @POST("yalbum/allPublicAlbum")
+    Call<List<YAlbum>> allPublicAlbum(@Query("page")int page);
 
     //获取爱壁纸接口
     @GET("category/homePage")

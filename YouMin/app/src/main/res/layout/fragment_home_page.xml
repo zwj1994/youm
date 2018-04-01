@@ -1,13 +1,15 @@
 <?xml version="1.0" encoding="utf-8"?>
-<ScrollView
-    xmlns:android="http://schemas.android.com/apk/res/android"
-    android:layout_width="match_parent"
-    android:id="@+id/mScrollView"
-    android:layout_height="match_parent">
+<!--<ScrollView-->
+    <!--xmlns:android="http://schemas.android.com/apk/res/android"-->
+    <!--android:layout_width="match_parent"-->
+    <!--android:id="@+id/mScrollView"-->
+    <!--android:layout_height="match_parent">-->
 
     <LinearLayout
+        xmlns:android="http://schemas.android.com/apk/res/android"
+        android:id="@+id/publicAlbumLayout"
         android:layout_width="match_parent"
-        android:layout_height="match_parent"
+        android:layout_height="wrap_content"
         android:orientation="vertical">
 
         <android.support.v4.view.ViewPager
@@ -15,16 +17,17 @@
             android:layout_width="match_parent"
             android:layout_height="200dp"/>
 
-        <RelativeLayout
+        <!--<LinearLayout-->
+            <!--android:layout_width="match_parent"-->
+            <!--android:layout_height="500dp"-->
+            <!--android:orientation="vertical">-->
+
+            <GridView
+            android:id="@+id/mGridView"
             android:layout_width="match_parent"
             android:layout_height="0dp"
-            android:layout_weight="1">
-
-            <com.bs.youmin.view.CalculateGridView
-                android:id="@+id/mGridView"
-                android:layout_width="match_parent"
-                android:layout_height="match_parent"
-                android:numColumns="2"/>
+            android:layout_weight="1"
+            android:numColumns="2"/>
 
             <!--<TextView-->
                 <!--android:layout_width="100dp"-->
@@ -34,8 +37,26 @@
                 <!--android:gravity="center"-->
                 <!--android:text="Every Day"-->
                 <!--android:textColor="@color/colorWhite"/>-->
+        <!--</LinearLayout>-->
+        <LinearLayout
+            android:visibility="gone"
+            android:id="@+id/publicAlbum_load_more"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:gravity="center"
+            android:orientation="vertical"
+            android:padding="5dp">
 
-        </RelativeLayout>
+            <ProgressBar
+                android:indeterminateDrawable="@drawable/progressbar"
+                android:layout_width="20dp"
+                android:layout_height="20dp"/>
 
+            <TextView
+                android:id="@+id/publicAlbum_load_more_tv"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="@string/progressbar_load_more"/>
+        </LinearLayout>
     </LinearLayout>
-</ScrollView>
+    <!--</ScrollView>-->

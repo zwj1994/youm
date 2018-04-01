@@ -10,6 +10,7 @@ package com.bs.youmin.view;
 
 import android.content.Context;
 import android.util.AttributeSet;
+import android.widget.AbsListView;
 import android.widget.GridView;
 
 public class CalculateGridView extends GridView {
@@ -30,5 +31,10 @@ public class CalculateGridView extends GridView {
     public void onMeasure(int widthMeasureSpec, int heightMeasureSpec) {
         int expandSpec = MeasureSpec.makeMeasureSpec(Integer.MAX_VALUE >> 2, MeasureSpec.AT_MOST);
         super.onMeasure(widthMeasureSpec, expandSpec);
+    }
+
+    @Override
+    public void setOnScrollListener(OnScrollListener l) {
+        super.setOnScrollListener(l);
     }
 }

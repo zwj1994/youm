@@ -134,7 +134,6 @@ public class AlbumRankingActivity extends BaseActivity {
      */
     private void loadData(final boolean loadFirst) {
         page++;
-
         GsonBuilder builder = new GsonBuilder();
         builder.registerTypeAdapter(Date.class, new JsonDeserializer<Date>() {
             public Date deserialize(JsonElement json, Type typeOfT, JsonDeserializationContext context) throws JsonParseException {
