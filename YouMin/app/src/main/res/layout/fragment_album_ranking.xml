@@ -151,5 +151,6 @@ android:layout_height="match_parent">
     app:fabSize="normal"
     app:elevation="5dp"
     app:rippleColor="#e7d161"
+    android:visibility="gone"
     />
 </RelativeLayout>

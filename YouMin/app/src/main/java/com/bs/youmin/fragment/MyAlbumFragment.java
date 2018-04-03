@@ -1,9 +1,12 @@
 package com.bs.youmin.fragment;
 
+import android.animation.AnimatorInflater;
+import android.animation.AnimatorSet;
 import android.content.Intent;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Message;
+import android.support.design.widget.FloatingActionButton;
 import android.support.v4.app.Fragment;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -13,6 +16,7 @@ import android.widget.AdapterView;
 import android.widget.Button;
 import android.widget.LinearLayout;
 import android.widget.ListView;
+import android.widget.RelativeLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -45,7 +49,7 @@ import retrofit2.converter.gson.GsonConverterFactory;
  *  创建时间:  2018/03/23 19:48
  *  描述：    我的
  */
-public class MyAlbumFragment extends Fragment {
+public class MyAlbumFragment extends Fragment implements View.OnClickListener{
 
     private ApiImp apiImp;
 
@@ -56,6 +60,17 @@ public class MyAlbumFragment extends Fragment {
     private LinearLayout load_more;
     private TextView ranking_load_more_tv;
     private int page = 0;
+
+    private FloatingActionButton fab01Add;
+    private boolean isAdd = false;
+    private RelativeLayout rlAddBill;
+    private int[] llId = new int[]{R.id.ll01,R.id.ll02,R.id.ll03};
+    private LinearLayout[] ll = new LinearLayout[llId.length];
+    private int[] fabId = new int[]{R.id.miniFab01,R.id.miniFab02,R.id.miniFab03};
+    private FloatingActionButton[] fab = new FloatingActionButton[fabId.length];
+    private AnimatorSet addBillTranslate1;
+    private AnimatorSet addBillTranslate2;
+    private AnimatorSet addBillTranslate3;
 
     private Handler mHandler = new Handler(){
         @Override
@@ -70,10 +85,24 @@ public class MyAlbumFragment extends Fragment {
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.fragment_album_ranking, container, false);
         initView(view);
+        setDefaultValues();
+        bindEvents();
         return view;
     }
 
     private void initView(View view) {
+
+        fab01Add = (FloatingActionButton)view.findViewById(R.id.fab01Add);
+        rlAddBill = (RelativeLayout)view.findViewById(R.id.rlAddBill);
+        rlAddBill.setOnClickListener(this);
+
+        for (int i = 0; i < llId.length;i++){
+            ll[i] = (LinearLayout)view.findViewById(llId[i]);
+        }
+        for (int i = 0;i < fabId.length; i++){
+            fab[i] = (FloatingActionButton)view.findViewById(fabId[i]);
+        }
+
         load_more = (LinearLayout) view.findViewById(R.id.ranking_load_more);
         ranking_load_more_tv = (TextView) view.findViewById(R.id.ranking_load_more_tv);
         mListView = (ListView) view.findViewById(R.id.mListView);
@@ -128,6 +157,7 @@ public class MyAlbumFragment extends Fragment {
             @Override
             public void onResponse(Call<List<YAlbum>> call, Response<List<YAlbum>> response) {
                  if (response.isSuccessful()) {
+                     fab01Add.setVisibility(View.VISIBLE);
                     if(null == response.body() || response.body().isEmpty()){
                         if(!loadFirst){
                             page--;
@@ -141,6 +171,7 @@ public class MyAlbumFragment extends Fragment {
                     }
                     mHandler.sendEmptyMessageDelayed(1,300);
                 }else if(response.code() == HttpStatus.SC_UNAUTHORIZED){
+                     fab01Add.setVisibility(View.GONE);
                     if(onButtonClick!=null){
                         onButtonClick.onClick(load_more);
                     }
@@ -173,5 +204,57 @@ public class MyAlbumFragment extends Fragment {
     //1、定义接口
     public interface OnButtonClick{
         public void onClick(View view);
+    }
+
+
+    private void setDefaultValues(){
+        addBillTranslate1 = (AnimatorSet) AnimatorInflater.loadAnimator(getActivity(),R.anim.add_bill_anim);
+        addBillTranslate2 = (AnimatorSet) AnimatorInflater.loadAnimator(getActivity(),R.anim.add_bill_anim);
+        addBillTranslate3 = (AnimatorSet) AnimatorInflater.loadAnimator(getActivity(),R.anim.add_bill_anim);
+    }
+    private void bindEvents(){
+        fab01Add.setOnClickListener(this);
+        for (int i = 0;i < fabId.length; i++){
+            fab[i].setOnClickListener(this);
+        }
+    }
+    @Override
+    public void onClick(View v) {
+        switch (v.getId()) {
+            case R.id.rlAddBill:
+                hideFABMenu();
+                break;
+            case R.id.fab01Add:
+                fab01Add.setImageResource(isAdd ? R.drawable.icon_add_btn:R.drawable.icon_add_click_btn);
+                isAdd = !isAdd;
+                rlAddBill.setVisibility(isAdd ? View.VISIBLE : View.GONE);
+                if (isAdd) {
+                    addBillTranslate1.setTarget(ll[0]);
+                    addBillTranslate1.start();
+                    addBillTranslate2.setTarget(ll[1]);
+                    addBillTranslate2.setStartDelay(150);
+                    addBillTranslate2.start();
+                    addBillTranslate3.setTarget(ll[2]);
+                    addBillTranslate3.setStartDelay(200);
+                    addBillTranslate3.start();
+                }
+                break;
+            case R.id.miniFab01:
+                hideFABMenu();
+                break;
+            case R.id.miniFab02:
+                hideFABMenu();
+                break;
+            case R.id.miniFab03:
+                hideFABMenu();
+                break;
+            default:
+                break;
+        }
+    }
+    private void hideFABMenu(){
+        rlAddBill.setVisibility(View.GONE);
+        fab01Add.setImageResource(R.drawable.icon_add_btn);
+        isAdd = false;
     }
 }
