@@ -13,6 +13,15 @@
         android:numColumns="2"
         />
 
+    <TextView
+    android:layout_width="100dp"
+    android:layout_height="wrap_content"
+    android:layout_marginTop="5dp"
+    android:background="@color/colorAccent"
+    android:gravity="center"
+    android:text="Every Day"
+    android:textColor="@color/colorWhite"/>
+
     <LinearLayout
         android:visibility="gone"
         android:id="@+id/ranking_load_more"
