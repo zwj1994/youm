@@ -8,14 +8,18 @@ import android.os.Handler;
 import android.os.Message;
 import android.support.design.widget.FloatingActionButton;
 import android.support.v4.app.Fragment;
+import android.support.v4.widget.SwipeRefreshLayout;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.AbsListView;
 import android.widget.AdapterView;
+import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.LinearLayout;
 import android.widget.ListView;
+import android.widget.ProgressBar;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -31,6 +35,8 @@ import com.bs.youmin.imp.ApiImp;
 import com.bs.youmin.model.ResultStatus;
 import com.bs.youmin.util.L;
 import com.bs.youmin.util.SaveUserUtil;
+import com.demievil.library.RefreshLayout;
+import com.squareup.picasso.Picasso;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -50,10 +56,11 @@ import retrofit2.converter.gson.GsonConverterFactory;
  *  创建时间:  2018/03/23 19:48
  *  描述：    我的
  */
-public class MyAlbumFragment extends Fragment implements View.OnClickListener{
+public class MyAlbumFragment extends Fragment implements View.OnClickListener, SwipeRefreshLayout.OnRefreshListener {
 
     private ApiImp apiImp;
 
+    RefreshLayout mRefreshLayout;
     private ListView mListView;
     private AlbumRankingListAdapter albumRankingListAdapter;
     private List<YAlbum> mList =  new ArrayList<>();
@@ -73,9 +80,20 @@ public class MyAlbumFragment extends Fragment implements View.OnClickListener{
     private AnimatorSet addBillTranslate2;
     private AnimatorSet addBillTranslate3;
 
+//    private TextView tv_more;
+//    private ProgressBar pb;
+//    View footerLayout;
+
     private Handler mHandler = new Handler(){
         @Override
         public void handleMessage(Message msg) {
+//            tv_more.setEnabled(true);
+//            tv_more.setText("加载更多");
+//            tv_more.setVisibility(View.GONE);
+//            pb.setVisibility(View.GONE);
+//            mRefreshLayout.setRefreshing(false);
+
+            ranking_load_more_tv.setText(getString(R.string.progressbar_load_more));
             load_more.setVisibility(View.GONE);
         }
     };
@@ -92,8 +110,9 @@ public class MyAlbumFragment extends Fragment implements View.OnClickListener{
     }
 
     private void initView(View view) {
-
+//        mRefreshLayout = (RefreshLayout) view.findViewById(R.id.fragment_myalbum_freshLayout);
         fab01Add = (FloatingActionButton)view.findViewById(R.id.fab01Add);
+        fab01Add.setVisibility(View.GONE);
         rlAddBill = (RelativeLayout)view.findViewById(R.id.rlAddBill);
         rlAddBill.setOnClickListener(this);
 
@@ -103,10 +122,23 @@ public class MyAlbumFragment extends Fragment implements View.OnClickListener{
         for (int i = 0;i < fabId.length; i++){
             fab[i] = (FloatingActionButton)view.findViewById(fabId[i]);
         }
+//        footerLayout = getActivity().getLayoutInflater().inflate(R.layout.list_item_more, null);
+//        tv_more = (TextView) footerLayout.findViewById(R.id.text_more);
+//        pb = (ProgressBar) footerLayout.findViewById(R.id.load_progress_bar);
 
         load_more = (LinearLayout) view.findViewById(R.id.ranking_load_more);
         ranking_load_more_tv = (TextView) view.findViewById(R.id.ranking_load_more_tv);
         mListView = (ListView) view.findViewById(R.id.mListView);
+//        mListView.addFooterView(footerLayout);
+
+//        mRefreshLayout.setOnRefreshListener(this);
+//        mRefreshLayout.setOnLoadListener(this);
+
+//        mRefreshLayout.setChildView(mListView);
+//        mRefreshLayout.setColorSchemeResources(android.R.color.holo_blue_bright,
+//                android.R.color.holo_green_dark,
+//                android.R.color.holo_red_light,
+//                android.R.color.holo_orange_dark);
 
         /**
          * 监听列表滑动到最后
@@ -123,8 +155,18 @@ public class MyAlbumFragment extends Fragment implements View.OnClickListener{
                 }
             }
             @Override
-            public void onScroll(AbsListView absListView, int i, int i1, int i2) {}
+            public void onScroll(AbsListView absListView, int i, int i1, int i2) {
+                if (i == 0) {
+
+                    fab01Add.show();
+
+                } else {
+
+                    fab01Add.hide();
+                }
+            }
         });
+
 
         /**
          * 列表Item单击事件
@@ -132,13 +174,25 @@ public class MyAlbumFragment extends Fragment implements View.OnClickListener{
         mListView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
             public void onItemClick(AdapterView<?> adapterView, View view, int i, long l) {
-                Intent intent = new Intent(getActivity(), AlbumRankingActivity.class);
-                intent.putExtra("name",mList.get(i).getaName());
-                intent.putExtra("aId",mList.get(i).getaId());
-                startActivity(intent);
+                if(view.getId() == R.id.footer_layout){
+//                    tv_more.setVisibility(View.GONE);
+//                    pb.setVisibility(View.VISIBLE);
+//                    loadData(false);
+                }else{
+                    Intent intent = new Intent(getActivity(), AlbumRankingActivity.class);
+                    intent.putExtra("name",mList.get(i).getaName());
+                    intent.putExtra("aId",mList.get(i).getaId());
+                    startActivity(intent);
+                }
+
             }
         });
 
+        loadData(true);
+    }
+
+    public void update() {
+        L.i("==========update");
         loadData(true);
     }
 
@@ -147,6 +201,9 @@ public class MyAlbumFragment extends Fragment implements View.OnClickListener{
      * @param loadFirst
      */
     private void loadData(final boolean loadFirst){
+        if(loadFirst){
+            page = 0;
+        }
         page++;
         Retrofit retrofit = new Retrofit.Builder().baseUrl(Ip.SERVER_URL)
                 .addConverterFactory(GsonConverterFactory.create()).build();
@@ -165,7 +222,7 @@ public class MyAlbumFragment extends Fragment implements View.OnClickListener{
                             ranking_load_more_tv.setText(getString(R.string.progressbar_not_have_more));
                         }
                     }else {
-                        parsingJson(response.body());
+                        parsingJson(response.body(),loadFirst);
                         if(!loadFirst){
                             albumRankingListAdapter.notifyDataSetChanged();
                         }
@@ -188,7 +245,10 @@ public class MyAlbumFragment extends Fragment implements View.OnClickListener{
     }
 
     //解析
-    private void parsingJson(List<YAlbum> list) {
+    private void parsingJson(List<YAlbum> list,final boolean loadFirst) {
+        if(loadFirst){
+            mList = new ArrayList<>();
+        }
         mList.addAll(list);
         albumRankingListAdapter = new AlbumRankingListAdapter(getActivity(), mList);
         mListView.setAdapter(albumRankingListAdapter);
@@ -202,6 +262,14 @@ public class MyAlbumFragment extends Fragment implements View.OnClickListener{
     public void setOnButtonClick(LoginFragment.OnButtonClick onButtonClick) {
         this.onButtonClick = onButtonClick;
     }
+
+    @Override
+    public void onRefresh() {
+        loadData(true);
+        mRefreshLayout.setLoading(false);
+    }
+
+
     //1、定义接口
     public interface OnButtonClick{
         public void onClick(View view);
@@ -259,4 +327,29 @@ public class MyAlbumFragment extends Fragment implements View.OnClickListener{
         fab01Add.setImageResource(R.drawable.icon_add_btn);
         isAdd = false;
     }
+
+//    @Override
+//    public void onLoad() {
+//        L.i("============onLoad");
+//        if (news_size == mlist.size()) {
+//            tv_more.setText("数据已加载完毕");
+//            tv_more.setEnabled(false);
+//            return;
+//        }
+//        tv_more.setVisibility(View.GONE);
+//        pb.setVisibility(View.VISIBLE);
+//        ranking_load_more_tv.setText(getString(R.string.progressbar_load_more));
+//        load_more.setVisibility(View.VISIBLE);
+//        loadData(false);
+//    }
+
+    /**
+     * 下拉刷新方法
+     */
+//    @Override
+//    public void onRefresh() {
+//        loadData(true);
+//        mRefreshLayout.setLoading(false);
+//    }
+
 }

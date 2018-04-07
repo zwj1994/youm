@@ -4,6 +4,7 @@ import android.annotation.SuppressLint;
 import android.app.AlertDialog;
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.net.Uri;
 import android.os.Bundle;
 import android.support.design.widget.NavigationView;
 import android.support.v4.app.FragmentTransaction;
@@ -28,6 +29,7 @@ import com.bs.youmin.fragment.HomePageFragment;
 import com.bs.youmin.fragment.LoginFragment;
 import com.bs.youmin.fragment.MyAlbumFragment;
 import com.bs.youmin.fragment.WeatherFragment;
+import com.bs.youmin.util.L;
 import com.bs.youmin.util.SaveUserUtil;
 import com.bs.youmin.view.CustomDialog;
 
@@ -310,5 +312,17 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
                 break;
         }
         dialogShare.dismiss();
+    }
+
+    @Override
+    public void onActivityResult(int requestCode, int resultCode, Intent data) {
+        L.i("=====onActivityResult"+requestCode);
+        if (resultCode == 200) {
+            if (myAlbumFragment != null) {
+
+                myAlbumFragment.update();
+            }
+        }
+
     }
 }

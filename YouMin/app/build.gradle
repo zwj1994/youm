@@ -37,7 +37,7 @@ dependencies {
     //RxVolley
     compile 'com.kymjs.rxvolley:rxvolley:1.1.4'
     compile 'com.kymjs.rxvolley:okhttp:1.1.4'
-
+    compile 'com.demievil.library:refreshlayout:1.0.0@aar'
     compile 'com.commit451:PhotoView:1.2.4'
     //JC Play
     compile 'fm.jiecao:jiecaovideoplayer:5.3'

@@ -54,6 +54,8 @@ import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
+import java.util.Random;
+import java.util.UUID;
 
 import cz.msebera.android.httpclient.Header;
 import me.nereo.multi_image_selector.MultiImageSelectorActivity;
@@ -216,10 +218,9 @@ public class CreateAlbumActivity extends Activity implements View.OnClickListene
     }
 
     private void upData() {
-
         str_content = et_content.getText().toString();
-        if (str_content.length() < 5) {
-            Toast.makeText(CreateAlbumActivity.this, "相册名称长度必须大于5个字符", Toast.LENGTH_SHORT).show();
+        if (str_content.length() < 1) {
+            Toast.makeText(CreateAlbumActivity.this, "相册名称不能为空", Toast.LENGTH_SHORT).show();
             return;
 
         }
@@ -259,6 +260,7 @@ public class CreateAlbumActivity extends Activity implements View.OnClickListene
                         finish();
                     }else {
                         Toast.makeText(CreateAlbumActivity.this, "发布失败", Toast.LENGTH_SHORT).show();
+                        ll_enter.setEnabled(true);
                     }
                 }
             }
@@ -266,6 +268,7 @@ public class CreateAlbumActivity extends Activity implements View.OnClickListene
             @Override
             public void onFailure(Call<ResultModel> call, Throwable t) {
                 L.i(t.toString());
+                ll_enter.setEnabled(true);
             }
         });
     }
@@ -289,7 +292,7 @@ public class CreateAlbumActivity extends Activity implements View.OnClickListene
                         byte[] b = stream.toByteArray();
                         // 将图片流以字符串形式存储下来
                         String file = new String(Base64Coder.encodeLines(b));
-                        String filename = user.getUsername()+ "_" + new SimpleDateFormat("yyyyMMdd_HHmmss").format(new Date()) + ".jpg";
+                        String filename = user.getUsername()+ "_" + new SimpleDateFormat("yyyyMMdd_HHmmss").format(new Date())+"_"+  genImageName() + ".jpg";
                         FileModel model = new FileModel();
                         model.setFile(file);
                         model.setName(filename);
@@ -323,25 +326,21 @@ public class CreateAlbumActivity extends Activity implements View.OnClickListene
         }
     }
 
+    public static String genImageName() {
+        //取当前时间的长整形值包含毫秒
+        long millis = System.currentTimeMillis();
+        //long millis = System.nanoTime();
+        //加上三位随机数
+        Random random = new Random();
+        int end3 = random.nextInt(999);
+        //如果不足三位前面补0
+        String str = millis + String.format("%03d", end3);
+
+        return str;
+    }
+
     @Override
     public void onActivityResult(int requestCode, int resultCode, Intent data) {
-
-
-        if (requestCode == 99) {
-            if (data == null) {
-                return;
-            } else {
-                location = data.getStringExtra("location");
-                if (location.equals("地点")) {
-                    cb_bool = false;
-                    //tv_location.setText(location);
-                } else {
-                    cb_bool = true;
-                    //tv_location.setText(location);
-                }
-
-            }
-        }
 
         if (requestCode == REQUEST_IMAGE) {
             if (resultCode == RESULT_OK) {

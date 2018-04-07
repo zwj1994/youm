@@ -9,34 +9,43 @@ android:layout_height="match_parent"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:orientation="vertical">
-    <ListView
-        android:id="@+id/mListView"
-        android:layout_width="match_parent"
-        android:layout_height="0dp"
-        android:layout_weight="1"
-        android:numColumns="2"
-        />
 
-    <LinearLayout
-        android:visibility="gone"
-        android:id="@+id/ranking_load_more"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:gravity="center"
-        android:orientation="vertical"
-        android:padding="5dp">
+        <!--<com.demievil.library.RefreshLayout-->
+            <!--android:id="@+id/fragment_myalbum_freshLayout"-->
+            <!--android:layout_width="match_parent"-->
+            <!--android:layout_height="wrap_content"-->
+            <!--android:background="#ffffff"-->
+            <!--&gt;-->
+            <ListView
+                android:id="@+id/mListView"
+                android:layout_width="match_parent"
+                android:layout_height="0dp"
+                android:layout_weight="1"
+                android:numColumns="2"
+                />
 
-        <ProgressBar
-            android:indeterminateDrawable="@drawable/progressbar"
-            android:layout_width="20dp"
-            android:layout_height="20dp"/>
+        <!--</com.demievil.library.RefreshLayout>-->
 
-        <TextView
-            android:id="@+id/ranking_load_more_tv"
-            android:layout_width="wrap_content"
+        <LinearLayout
+            android:visibility="gone"
+            android:id="@+id/ranking_load_more"
+            android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:text="@string/progressbar_load_more"/>
-    </LinearLayout>
+            android:gravity="center"
+            android:orientation="vertical"
+            android:padding="5dp">
+
+            <ProgressBar
+                android:indeterminateDrawable="@drawable/progressbar"
+                android:layout_width="20dp"
+                android:layout_height="20dp"/>
+
+            <TextView
+                android:id="@+id/ranking_load_more_tv"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="@string/progressbar_load_more"/>
+        </LinearLayout>
     </LinearLayout>
 <RelativeLayout
     android:id="@+id/rlAddBill"
