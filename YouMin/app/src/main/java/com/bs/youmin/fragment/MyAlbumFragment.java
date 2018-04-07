@@ -22,6 +22,7 @@ import android.widget.Toast;
 
 import com.bs.youmin.R;
 import com.bs.youmin.activity.AlbumRankingActivity;
+import com.bs.youmin.activity.CreateAlbumActivity;
 import com.bs.youmin.adapter.AlbumRankingListAdapter;
 import com.bs.youmin.entity.Ip;
 import com.bs.youmin.entity.User;
@@ -246,6 +247,7 @@ public class MyAlbumFragment extends Fragment implements View.OnClickListener{
                 hideFABMenu();
                 break;
             case R.id.miniFab03:
+                startActivity(new Intent(getActivity(), CreateAlbumActivity.class));
                 hideFABMenu();
                 break;
             default:

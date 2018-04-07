@@ -20,7 +20,7 @@ android {
 }
 
 dependencies {
-    compile fileTree(dir: 'libs', include: ['*.jar'])
+    compile fileTree(include: ['*.jar'], dir: 'libs')
     androidTestCompile('com.android.support.test.espresso:espresso-core:2.2.2', {
         exclude group: 'com.android.support', module: 'support-annotations'
     })
@@ -37,8 +37,11 @@ dependencies {
     //RxVolley
     compile 'com.kymjs.rxvolley:rxvolley:1.1.4'
     compile 'com.kymjs.rxvolley:okhttp:1.1.4'
+
+    compile 'com.commit451:PhotoView:1.2.4'
     //JC Play
     compile 'fm.jiecao:jiecaovideoplayer:5.3'
     compile 'com.loopj.android:android-async-http:1.4.9'
     testCompile 'junit:junit:4.12'
+    implementation project(':multi-image-selector')
 }

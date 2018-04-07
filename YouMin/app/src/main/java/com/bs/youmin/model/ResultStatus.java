@@ -7,6 +7,7 @@ package com.bs.youmin.model;
  */
 public enum ResultStatus {
     SUCCESS(100, "成功"),
+    FAIL(500, "失败"),
     NO_KEY_ERROR(-1000, "密钥不存在"),
     USERNAME_OR_PASSWORD_ERROR(-1001, "用户名或密码错误"),
     USER_NOT_FOUND(-1002, "用户不存在"),
