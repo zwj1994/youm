@@ -47,7 +47,7 @@ public class YAlbum {
     }
 
     public String getaCover() {
-        return aCover;
+        return Ip.LOAD_IMG_URL + aCover;
     }
 
     public void setaCover(String aCover) {

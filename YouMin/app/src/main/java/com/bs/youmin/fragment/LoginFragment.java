@@ -96,6 +96,7 @@ public class LoginFragment extends Fragment {
                                 user.setUsername(tokenModel.getUserId());
                                 user.setHeaderImg(tokenModel.getHeaderImg());
                                 user.setSign(tokenModel.getSign());
+                                user.setUid(tokenModel.getuId());
                                 SaveUserUtil.saveAccount(getActivity(),user);
                                 Toast.makeText(getActivity(), resultModel.getMessage(),Toast.LENGTH_SHORT).show();
 

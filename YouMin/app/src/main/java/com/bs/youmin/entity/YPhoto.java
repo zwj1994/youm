@@ -26,7 +26,7 @@ public class YPhoto {
     }
 
     public String getpBig() {
-        return pBig;
+        return Ip.LOAD_IMG_URL + pBig;
     }
 
     public void setpBig(String pBig) {
@@ -34,7 +34,7 @@ public class YPhoto {
     }
 
     public String getpSmall() {
-        return pSmall;
+        return Ip.LOAD_IMG_URL + pSmall;
     }
 
     public void setpSmall(String pSmall) {

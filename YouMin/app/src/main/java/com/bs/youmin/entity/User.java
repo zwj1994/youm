@@ -19,6 +19,8 @@ public class User implements Serializable {
         this.identifier = identifier;
     }
 
+    private String uid;
+
     private String username;
 
     private String password;
@@ -34,6 +36,14 @@ public class User implements Serializable {
     private String headerImg;
 
     private String sign;
+
+    public String getUid() {
+        return uid;
+    }
+
+    public void setUid(String uid) {
+        this.uid = uid;
+    }
 
     public String getHeaderImg() {
         return headerImg;

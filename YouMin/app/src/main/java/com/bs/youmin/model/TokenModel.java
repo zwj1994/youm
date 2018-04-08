@@ -10,6 +10,8 @@ public class TokenModel {
     //用户id
     private String userId;
 
+    private String uId;
+
     //随机生成的uuid
     private String token;
 
@@ -20,6 +22,14 @@ public class TokenModel {
     public TokenModel(String userId, String token) {
         this.userId = userId;
         this.token = token;
+    }
+
+    public String getuId() {
+        return uId;
+    }
+
+    public void setuId(String uId) {
+        this.uId = uId;
     }
 
     public String getHeaderImg() {

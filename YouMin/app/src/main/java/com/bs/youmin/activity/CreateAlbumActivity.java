@@ -3,7 +3,6 @@ package com.bs.youmin.activity;
 import android.annotation.TargetApi;
 import android.app.Activity;
 import android.content.Intent;
-import android.graphics.Bitmap;
 import android.graphics.drawable.ColorDrawable;
 import android.os.Build;
 import android.os.Bundle;
@@ -28,41 +27,36 @@ import android.widget.Toast;
 import com.bs.youmin.R;
 import com.bs.youmin.entity.Ip;
 import com.bs.youmin.entity.User;
-import com.bs.youmin.entity.YAlbum;
 import com.bs.youmin.imp.ApiImp;
 import com.bs.youmin.model.ResultModel;
 import com.bs.youmin.model.ResultStatus;
-import com.bs.youmin.model.TokenModel;
-import com.bs.youmin.util.Base64Coder;
-import com.bs.youmin.util.ImageCompressUtils;
 import com.bs.youmin.util.L;
 import com.bs.youmin.util.PhotoSelectedHelper;
 import com.bs.youmin.util.SaveUserUtil;
-import com.google.gson.Gson;
-import com.loopj.android.http.AsyncHttpClient;
-import com.loopj.android.http.AsyncHttpResponseHandler;
-import com.loopj.android.http.RequestParams;
+import com.bs.youmin.util.upload.DefaultProgressListener;
+import com.bs.youmin.util.upload.UploadFileRequestBody;
+import com.bs.youmin.util.upload.UploadService;
 import com.squareup.picasso.Callback;
 import com.squareup.picasso.Picasso;
-
-import org.json.JSONException;
-import org.json.JSONObject;
-
 import java.io.ByteArrayOutputStream;
 import java.io.File;
-import java.text.SimpleDateFormat;
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
+import java.io.IOException;
 import java.util.ArrayList;
-import java.util.Date;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.Random;
-import java.util.UUID;
+import java.util.concurrent.TimeUnit;
 
-import cz.msebera.android.httpclient.Header;
 import me.nereo.multi_image_selector.MultiImageSelectorActivity;
 import me.nereo.multi_image_selector.adapter.MainGridAdapter;
 import me.nereo.multi_image_selector.bean.Image;
 import okhttp3.MediaType;
+import okhttp3.OkHttpClient;
 import okhttp3.RequestBody;
+import okhttp3.ResponseBody;
 import retrofit2.Call;
 import retrofit2.Response;
 import retrofit2.Retrofit;
@@ -203,6 +197,45 @@ public class CreateAlbumActivity extends Activity implements View.OnClickListene
 
     }
 
+    private void uploadImg(String uId,String content,boolean isPrivate){
+        Map<String, Object> optionMap = new HashMap<>();
+        optionMap.put("uId", uId);
+        optionMap.put("content",content) ;
+        optionMap.put("isPrivate",isPrivate) ;
+
+        Map<String, RequestBody> requestBodyMap = new HashMap<>();
+        for(int i = 0;i < mSelectPath.size();i++){
+            File file = new File(mSelectPath.get(i));
+            UploadFileRequestBody fileRequestBody = new UploadFileRequestBody(file, new DefaultProgressListener(h,1));
+            requestBodyMap.put("file\"; filename=\"" + file.getName(), fileRequestBody);
+        }
+
+
+        OkHttpClient client = new OkHttpClient.Builder().
+                connectTimeout(60, TimeUnit.SECONDS).
+                readTimeout(60, TimeUnit.SECONDS).
+                writeTimeout(60, TimeUnit.SECONDS).build();
+        Retrofit retrofit = new Retrofit.Builder().baseUrl(Ip.SERVER_URL).client(client)
+                .addConverterFactory(GsonConverterFactory.create()).build();
+        UploadService uploadService = retrofit.create(UploadService.class);
+        Call<ResponseBody> call = uploadService.uploadFileInfo(optionMap, requestBodyMap);
+        //请求数据
+        call.enqueue(new retrofit2.Callback<ResponseBody>() {
+            @Override
+            public void onResponse(Call<ResponseBody> call, Response<ResponseBody> response) {
+                Toast.makeText(CreateAlbumActivity.this, response.isSuccessful()+"", Toast.LENGTH_SHORT).show();
+                if (response.isSuccessful()) {
+                }
+            }
+
+            @Override
+            public void onFailure(Call<ResponseBody> call, Throwable t) {
+                L.i(t.toString());
+                ll_enter.setEnabled(true);
+            }
+        });
+    }
+
     @Override
     public void onClick(View v) {
 
@@ -228,7 +261,7 @@ public class CreateAlbumActivity extends Activity implements View.OnClickListene
             Toast.makeText(CreateAlbumActivity.this, "您还没有选择相片", Toast.LENGTH_SHORT).show();
             return;
         }
-        Message m = h.obtainMessage(1);
+        Message m = h.obtainMessage(999);
         h.sendMessage(m);
 
     }
@@ -242,7 +275,11 @@ public class CreateAlbumActivity extends Activity implements View.OnClickListene
      * @param files
      */
     private void createAlbum(String content,boolean isPrivate,int image_size,String authorization,String files){
-        Retrofit retrofit = new Retrofit.Builder().baseUrl(Ip.SERVER_URL)
+        OkHttpClient client = new OkHttpClient.Builder().
+                connectTimeout(60, TimeUnit.SECONDS).
+                readTimeout(60, TimeUnit.SECONDS).
+                writeTimeout(60, TimeUnit.SECONDS).build();
+        Retrofit retrofit = new Retrofit.Builder().baseUrl(Ip.SERVER_URL).client(client)
                 .addConverterFactory(GsonConverterFactory.create()).build();
         apiImp = retrofit.create(ApiImp.class);
         RequestBody files_body = RequestBody.create(MediaType.parse("application/json"),files);
@@ -276,34 +313,64 @@ public class CreateAlbumActivity extends Activity implements View.OnClickListene
     Handler h = new Handler() {
         @Override
         public void handleMessage(Message msg) {
-            if (msg.what == 1) {
+            if (msg.what == 999) {
                 final User user = SaveUserUtil.loadAccount(CreateAlbumActivity.this);
-                String authorization = user.getUsername()+"_"+user.getToken();
-                ll_enter.setEnabled(false);
-                int image_size = 0;
-                List<FileModel> list= new ArrayList<>();
-                String strs = "";
-                if (mSelectPath != null && mSelectPath.size() > 0) {
-                    image_size = mSelectPath.size();
-                    for (int i = 0; i < mSelectPath.size(); i++) {
-                        ByteArrayOutputStream stream = new ByteArrayOutputStream();
-                        ImageCompressUtils.getimage(mSelectPath.get(i)).compress(Bitmap.CompressFormat.JPEG,
-                                80, stream);
-                        byte[] b = stream.toByteArray();
-                        // 将图片流以字符串形式存储下来
-                        String file = new String(Base64Coder.encodeLines(b));
-                        String filename = user.getUsername()+ "_" + new SimpleDateFormat("yyyyMMdd_HHmmss").format(new Date())+"_"+  genImageName() + ".jpg";
-                        FileModel model = new FileModel();
-                        model.setFile(file);
-                        model.setName(filename);
-                        list.add(model);
-                    }
-                }
-                Gson gson = new Gson();
-                createAlbum(str_content,rbPrivate.isChecked(),image_size,authorization,gson.toJson(list));
+                uploadImg(user.getUid(),str_content,rbPrivate.isChecked());
+//                final User user = SaveUserUtil.loadAccount(CreateAlbumActivity.this);
+//                String authorization = user.getUsername()+"_"+user.getToken();
+//                ll_enter.setEnabled(false);
+//                int image_size = 0;
+//                List<FileModel> list= new ArrayList<>();
+//                String strs = "";
+//                if (mSelectPath != null && mSelectPath.size() > 0) {
+//                    image_size = mSelectPath.size();
+//                    for (int i = 0; i < mSelectPath.size(); i++) {
+//                        byte[] b = null;
+//                        if(isYuantu){
+//                            b = image2byte(mSelectPath.get(i));
+//                        }else{
+//                            ByteArrayOutputStream stream = new ByteArrayOutputStream();
+//                            ImageCompressUtils.getimage(mSelectPath.get(i)).compress(Bitmap.CompressFormat.PNG,
+//                                    80, stream);
+//                            b = stream.toByteArray();
+//                        }
+//                        // 将图片流以字符串形式存储下来
+//                        String file = new String(Base64Coder.encodeLines(b));
+//                        String filename = user.getUsername()+ "_" + new SimpleDateFormat("yyyyMMdd_HHmmss").format(new Date())+"_"+  genImageName() + ".jpg";
+//                        FileModel model = new FileModel();
+//                        model.setFile(file);
+//                        model.setName(filename);
+//                        list.add(model);
+//                    }
+//                }
+//                Gson gson = new Gson();
+//                createAlbum(str_content,rbPrivate.isChecked(),image_size,authorization,gson.toJson(list));
             }
         }
     };
+    public byte[] image2byte(String path){
+        byte[] data = null;
+        FileInputStream input = null;
+        try {
+            input = new FileInputStream(new File(path));
+            ByteArrayOutputStream output = new ByteArrayOutputStream();
+            byte[] buf = new byte[1024];
+            int numBytesRead = 0;
+            while ((numBytesRead = input.read(buf)) != -1) {
+                output.write(buf, 0, numBytesRead);
+            }
+            data = output.toByteArray();
+            output.close();
+            input.close();
+        }
+        catch (FileNotFoundException ex1) {
+            ex1.printStackTrace();
+        }
+        catch (IOException ex1) {
+            ex1.printStackTrace();
+        }
+        return data;
+    }
 
     class FileModel{
         private String file;

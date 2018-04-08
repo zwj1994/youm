@@ -157,11 +157,8 @@ public class MyAlbumFragment extends Fragment implements View.OnClickListener, S
             @Override
             public void onScroll(AbsListView absListView, int i, int i1, int i2) {
                 if (i == 0) {
-
                     fab01Add.show();
-
                 } else {
-
                     fab01Add.hide();
                 }
             }
