@@ -13,15 +13,20 @@ import com.bs.youmin.model.ResultModel;
 import com.bs.youmin.model.TokenModel;
 
 import java.util.List;
+import java.util.Map;
 
 import okhttp3.RequestBody;
+import okhttp3.ResponseBody;
 import retrofit2.Call;
 import retrofit2.http.Body;
 import retrofit2.http.DELETE;
 import retrofit2.http.GET;
 import retrofit2.http.Header;
+import retrofit2.http.Multipart;
 import retrofit2.http.POST;
+import retrofit2.http.PartMap;
 import retrofit2.http.Query;
+import retrofit2.http.QueryMap;
 
 public interface ApiImp {
 
@@ -83,15 +88,15 @@ public interface ApiImp {
 
     /**
      * 创建相册
-     * @param content
-     * @param isPrivate
-     * @param image_size
+     * @param options
+     * @param externalFileParameters
      * @param authorization
-     * @param files
      * @return
      */
     @POST("yalbum/createAlbum")
-    Call<ResultModel> createAlbum(@Header("authorization") String authorization,@Query("content")String content,@Query("isPrivate")boolean isPrivate,@Query("image_size")int image_size,@Body RequestBody files);
+    @Multipart
+    Call<ResultModel> createAlbum(@QueryMap Map<String, Object> options,
+                                      @PartMap Map<String, RequestBody> externalFileParameters, @Header("authorization") String authorization) ;
 
     //获取爱壁纸接口
     @GET("category/homePage")

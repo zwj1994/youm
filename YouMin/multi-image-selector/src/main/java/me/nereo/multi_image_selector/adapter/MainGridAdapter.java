@@ -13,7 +13,9 @@ import com.squareup.picasso.Picasso;
 
 import java.io.File;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import me.nereo.multi_image_selector.R;
 import me.nereo.multi_image_selector.bean.Image;
@@ -23,6 +25,7 @@ import me.nereo.multi_image_selector.bean.Image;
  */
 public class MainGridAdapter extends BaseAdapter {
     private List<Image> mImages = new ArrayList<>();
+    private Map<Integer,Viewholder> viewholders = new HashMap<>();
     private LayoutInflater mInflater;
     private Context mContext;
     private Callback mCallback;
@@ -87,7 +90,6 @@ public class MainGridAdapter extends BaseAdapter {
 
     @Override
     public View getView(int position, View convertView, ViewGroup parent) {
-
         if (mImages.size() != number && position >= mImages.size()) {
             convertView = mInflater.inflate(R.layout.grid_item_add, parent, false);
             convertView.setTag(null);
@@ -104,7 +106,9 @@ public class MainGridAdapter extends BaseAdapter {
                 }
             }
             if (viewholder != null) {
+                System.out.println("============================position>="+position);
                 viewholder.bindData(getItem(position));
+                viewholders.put(position,viewholder);
             }
         }
         GridView.LayoutParams lp = (GridView.LayoutParams) convertView.getLayoutParams();
@@ -118,11 +122,29 @@ public class MainGridAdapter extends BaseAdapter {
     }
 
 
-    class Viewholder {
+    public Viewholder getViewholders(int position) {
+        return viewholders.get(position);
+    }
+
+    public class Viewholder {
         ImageView image;
         ImageView indicator;
 
+        public ImageView getImage() {
+            return image;
+        }
+
+        @Override
+        public String toString() {
+            return "Viewholder{" +
+                    "image=" + image +
+                    ", indicator=" + indicator +
+                    '}';
+        }
+
         Viewholder(View view) {
+
+
             image = (ImageView) view.findViewById(R.id.grid_item_image);
             indicator = (ImageView) view.findViewById(R.id.grid_item_delete);
             view.setTag(this);

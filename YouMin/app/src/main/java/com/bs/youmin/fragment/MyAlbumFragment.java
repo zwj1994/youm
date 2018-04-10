@@ -312,7 +312,8 @@ public class MyAlbumFragment extends Fragment implements View.OnClickListener, S
                 hideFABMenu();
                 break;
             case R.id.miniFab03:
-                startActivity(new Intent(getActivity(), CreateAlbumActivity.class));
+                Intent intent = new Intent(getActivity(), CreateAlbumActivity.class);
+                startActivityForResult(intent,1);
                 hideFABMenu();
                 break;
             default:

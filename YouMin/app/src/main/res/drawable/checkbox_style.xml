@@ -1,0 +1,11 @@
+<selector xmlns:android="http://schemas.android.com/apk/res/android" >
+    <item
+        android:drawable="@drawable/cbox_checked"
+        android:state_checked="true"/>
+    <item
+        android:drawable="@drawable/cbox_unchecked"
+        android:state_checked="false"/>
+    <item
+        android:drawable="@drawable/cbox_unchecked"/>
+
+</selector>

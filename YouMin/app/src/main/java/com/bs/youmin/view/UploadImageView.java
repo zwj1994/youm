@@ -35,10 +35,12 @@ public class UploadImageView extends android.support.v7.widget.AppCompatImageVie
     @Override
     protected void onDraw(Canvas canvas) {
         super.onDraw(canvas);
+        System.out.println("==================onDraw="+mPercent);
         canvas.drawRect(0, 0, getWidth(), getHeight() * (100 - mPercent) / 100, mPaint);
     }
 
     public void updatePercent(int percent) {
+        System.out.println("==================updatePercent="+percent);
         this.mPercent = percent ;
         if(mPercent < 0) mPercent = 0;
         if(mPercent > 100) mPercent = 100 ;

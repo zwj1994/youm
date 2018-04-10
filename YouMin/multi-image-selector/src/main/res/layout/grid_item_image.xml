@@ -3,7 +3,14 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent">
 
-    <ImageView
+    <!--<ImageView-->
+        <!--android:id="@+id/grid_item_image"-->
+        <!--android:layout_width="match_parent"-->
+        <!--android:layout_height="match_parent"-->
+        <!--android:scaleType="centerInside"-->
+        <!--android:src="@drawable/default_error" />-->
+
+    <com.bs.youmin.view.UploadImageView
         android:id="@+id/grid_item_image"
         android:layout_width="match_parent"
         android:layout_height="match_parent"

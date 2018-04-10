@@ -18,9 +18,9 @@ import retrofit2.http.QueryMap;
  */
 public interface UploadService {
 
-    @POST("up")
+    @POST("yalbum/testuploadimg")
     @Multipart
     Call<ResponseBody> uploadFileInfo(@QueryMap Map<String, Object> options,
-                                      @PartMap Map<String, RequestBody> externalFileParameters) ;
+                                      @PartMap Map<String, RequestBody> externalFileParameters,@Header("authorization") String authorization) ;
 
 }

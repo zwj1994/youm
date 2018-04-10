@@ -4,6 +4,7 @@ import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
 import java.util.Date;
+import java.util.Random;
 
 /**
  * 日期操作工具类.
@@ -89,9 +90,7 @@ public class DateUtil {
         Calendar c = Calendar.getInstance();
         c.setTime(new Date());
         return c.get(Calendar.YEAR) + "-" + (c.get(Calendar.MONTH) + 1) + "-"
-                + c.get(Calendar.DAY_OF_MONTH) + "-"
-                + c.get(Calendar.HOUR_OF_DAY) + ":" + c.get(Calendar.MINUTE)
-                + ":" + c.get(Calendar.SECOND);
+                + c.get(Calendar.DAY_OF_MONTH);
     }
 
     /**
@@ -363,6 +362,23 @@ public class DateUtil {
         cal.setTime(newdate);
         String imptimeBegin = sdf.format(cal.getTime());
         return imptimeBegin;
+    }
+
+    /**
+     * 获取长整型时间戳+随机数
+     * @return
+     */
+    public static String genCurrentTimeMillisame() {
+        //取当前时间的长整形值包含毫秒
+        long millis = System.currentTimeMillis();
+        //long millis = System.nanoTime();
+        //加上三位随机数
+        Random random = new Random();
+        int end3 = random.nextInt(999);
+        //如果不足三位前面补0
+        String str = millis + String.format("%03d", end3);
+
+        return str;
     }
 
 }

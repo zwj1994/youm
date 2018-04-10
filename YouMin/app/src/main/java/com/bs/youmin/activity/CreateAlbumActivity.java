@@ -3,6 +3,7 @@ package com.bs.youmin.activity;
 import android.annotation.TargetApi;
 import android.app.Activity;
 import android.content.Intent;
+import android.graphics.Bitmap;
 import android.graphics.drawable.ColorDrawable;
 import android.os.Build;
 import android.os.Bundle;
@@ -16,6 +17,7 @@ import android.view.ViewTreeObserver;
 import android.view.Window;
 import android.view.WindowManager;
 import android.widget.AdapterView;
+import android.widget.CheckBox;
 import android.widget.EditText;
 import android.widget.GridView;
 import android.widget.ImageView;
@@ -30,12 +32,15 @@ import com.bs.youmin.entity.User;
 import com.bs.youmin.imp.ApiImp;
 import com.bs.youmin.model.ResultModel;
 import com.bs.youmin.model.ResultStatus;
+import com.bs.youmin.util.DateUtil;
+import com.bs.youmin.util.ImageCompressUtils;
 import com.bs.youmin.util.L;
 import com.bs.youmin.util.PhotoSelectedHelper;
 import com.bs.youmin.util.SaveUserUtil;
 import com.bs.youmin.util.upload.DefaultProgressListener;
 import com.bs.youmin.util.upload.UploadFileRequestBody;
 import com.bs.youmin.util.upload.UploadService;
+import com.bs.youmin.view.UploadImageView;
 import com.squareup.picasso.Callback;
 import com.squareup.picasso.Picasso;
 import java.io.ByteArrayOutputStream;
@@ -44,6 +49,7 @@ import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -57,6 +63,7 @@ import okhttp3.MediaType;
 import okhttp3.OkHttpClient;
 import okhttp3.RequestBody;
 import okhttp3.ResponseBody;
+import okio.BufferedSink;
 import retrofit2.Call;
 import retrofit2.Response;
 import retrofit2.Retrofit;
@@ -74,6 +81,7 @@ public class CreateAlbumActivity extends Activity implements View.OnClickListene
     PhotoViewAttacher mAttacher;
     RadioButton rbPublic;
     RadioButton rbPrivate;
+    CheckBox cbIsYuanTu;
 
 
     GridView mGridView;
@@ -112,6 +120,7 @@ public class CreateAlbumActivity extends Activity implements View.OnClickListene
         ll_enter = (LinearLayout) findViewById(R.id.luntan_state_layout_enter);
         rbPublic = (RadioButton) findViewById(R.id.rbPublic);
         rbPrivate = (RadioButton) findViewById(R.id.rbPrivate);
+        cbIsYuanTu = (CheckBox)findViewById(R.id.isYuanTu);
 
         et_content = (EditText) findViewById(R.id.luntan_state_edittext_content);
         mGridView = (GridView) findViewById(R.id.luntan_state_gridview);
@@ -147,7 +156,7 @@ public class CreateAlbumActivity extends Activity implements View.OnClickListene
                     // 是否显示拍摄图片
                     intent.putExtra(MultiImageSelectorActivity.EXTRA_SHOW_CAMERA, true);
                     // 最大可选择图片数量
-                    intent.putExtra(MultiImageSelectorActivity.EXTRA_SELECT_COUNT, 13);
+                    intent.putExtra(MultiImageSelectorActivity.EXTRA_SELECT_COUNT, 9);
                     // 选择模式
                     intent.putExtra(MultiImageSelectorActivity.EXTRA_SELECT_MODE, 1);
                     // 默认选择
@@ -197,39 +206,74 @@ public class CreateAlbumActivity extends Activity implements View.OnClickListene
 
     }
 
-    private void uploadImg(String uId,String content,boolean isPrivate){
+    /**
+     * 组装上传参数
+     * @param content
+     * @param isPrivate
+     */
+    private void assemblyParameters(String content,boolean isPrivate){
+
+        final User user = SaveUserUtil.loadAccount(CreateAlbumActivity.this);
+        String authorization = user.getUsername()+"_"+user.getToken();
+
         Map<String, Object> optionMap = new HashMap<>();
-        optionMap.put("uId", uId);
         optionMap.put("content",content) ;
         optionMap.put("isPrivate",isPrivate) ;
 
         Map<String, RequestBody> requestBodyMap = new HashMap<>();
         for(int i = 0;i < mSelectPath.size();i++){
-            File file = new File(mSelectPath.get(i));
-            UploadFileRequestBody fileRequestBody = new UploadFileRequestBody(file, new DefaultProgressListener(h,1));
-            requestBodyMap.put("file\"; filename=\"" + file.getName(), fileRequestBody);
+            UploadFileRequestBody fileRequestBody = null;
+            if(cbIsYuanTu.isChecked()){
+                File file = new File(mSelectPath.get(i));
+                fileRequestBody = new UploadFileRequestBody(file, new DefaultProgressListener(h,i));
+            }else{
+                ByteArrayOutputStream stream = new ByteArrayOutputStream();
+                ImageCompressUtils.getimage(mSelectPath.get(i)).compress(Bitmap.CompressFormat.JPEG,
+                        80, stream);
+                byte [] b = stream.toByteArray();
+                RequestBody requestBody = RequestBody.create(MediaType.parse("multipart/form-data"),b);
+                fileRequestBody = new UploadFileRequestBody(requestBody, new DefaultProgressListener(h,i));
+            }
+            requestBodyMap.put("file\"; filename=\"" + user.getUsername() +"_" + DateUtil.getCurDateStr() + "_" + DateUtil.genCurrentTimeMillisame() + ".jpg", fileRequestBody);
         }
+        uploadImg(optionMap,requestBodyMap,authorization);
+    }
 
+    /**
+     * 上传相片
+     * @param optionMap
+     * @param requestBodyMap
+     * @param authorization
+     */
+    private void uploadImg( Map<String, Object> optionMap,Map<String, RequestBody> requestBodyMap,String authorization){
 
         OkHttpClient client = new OkHttpClient.Builder().
                 connectTimeout(60, TimeUnit.SECONDS).
                 readTimeout(60, TimeUnit.SECONDS).
                 writeTimeout(60, TimeUnit.SECONDS).build();
+
         Retrofit retrofit = new Retrofit.Builder().baseUrl(Ip.SERVER_URL).client(client)
                 .addConverterFactory(GsonConverterFactory.create()).build();
-        UploadService uploadService = retrofit.create(UploadService.class);
-        Call<ResponseBody> call = uploadService.uploadFileInfo(optionMap, requestBodyMap);
-        //请求数据
-        call.enqueue(new retrofit2.Callback<ResponseBody>() {
+
+        ApiImp apiImp = retrofit.create(ApiImp.class);
+        Call<ResultModel> call = apiImp.createAlbum(optionMap, requestBodyMap,authorization);
+        call.enqueue(new retrofit2.Callback<ResultModel>() {
             @Override
-            public void onResponse(Call<ResponseBody> call, Response<ResponseBody> response) {
-                Toast.makeText(CreateAlbumActivity.this, response.isSuccessful()+"", Toast.LENGTH_SHORT).show();
+            public void onResponse(Call<ResultModel> call, Response<ResultModel> response) {
                 if (response.isSuccessful()) {
+                    if(ResultStatus.SUCCESS.getCode() == response.body().getCode()){
+                        Toast.makeText(CreateAlbumActivity.this, "发布成功", Toast.LENGTH_SHORT).show();
+                        Intent intents = new Intent(CreateAlbumActivity.this, MainActivity.class);
+                        setResult(666, intents);
+                        finish();
+                    }else {
+                        Toast.makeText(CreateAlbumActivity.this, "发布失败", Toast.LENGTH_SHORT).show();
+                        ll_enter.setEnabled(true);
+                    }
                 }
             }
-
             @Override
-            public void onFailure(Call<ResponseBody> call, Throwable t) {
+            public void onFailure(Call<ResultModel> call, Throwable t) {
                 L.i(t.toString());
                 ll_enter.setEnabled(true);
             }
@@ -238,7 +282,6 @@ public class CreateAlbumActivity extends Activity implements View.OnClickListene
 
     @Override
     public void onClick(View v) {
-
         switch (v.getId()) {
             case R.id.luntan_state_layout_back:
                 finish();
@@ -266,149 +309,22 @@ public class CreateAlbumActivity extends Activity implements View.OnClickListene
 
     }
 
-    /**
-     * 创建相册
-     * @param content
-     * @param isPrivate
-     * @param image_size
-     * @param authorization
-     * @param files
-     */
-    private void createAlbum(String content,boolean isPrivate,int image_size,String authorization,String files){
-        OkHttpClient client = new OkHttpClient.Builder().
-                connectTimeout(60, TimeUnit.SECONDS).
-                readTimeout(60, TimeUnit.SECONDS).
-                writeTimeout(60, TimeUnit.SECONDS).build();
-        Retrofit retrofit = new Retrofit.Builder().baseUrl(Ip.SERVER_URL).client(client)
-                .addConverterFactory(GsonConverterFactory.create()).build();
-        apiImp = retrofit.create(ApiImp.class);
-        RequestBody files_body = RequestBody.create(MediaType.parse("application/json"),files);
-        Call<ResultModel> call = apiImp.createAlbum(authorization,content,isPrivate,image_size,files_body);
-        //请求数据
-        call.enqueue(new retrofit2.Callback<ResultModel>() {
-            @Override
-            public void onResponse(Call<ResultModel> call, Response<ResultModel> response) {
-                L.i(response.isSuccessful()+"");
-                if (response.isSuccessful()) {
-                    if(ResultStatus.SUCCESS.getCode() == response.body().getCode()){
-                        Toast.makeText(CreateAlbumActivity.this, "发布成功", Toast.LENGTH_SHORT).show();
-                        Intent intents = new Intent(CreateAlbumActivity.this, MainActivity.class);
-                        setResult(200, intents);
-                        finish();
-                    }else {
-                        Toast.makeText(CreateAlbumActivity.this, "发布失败", Toast.LENGTH_SHORT).show();
-                        ll_enter.setEnabled(true);
-                    }
-                }
-            }
-
-            @Override
-            public void onFailure(Call<ResultModel> call, Throwable t) {
-                L.i(t.toString());
-                ll_enter.setEnabled(true);
-            }
-        });
-    }
 
     Handler h = new Handler() {
         @Override
         public void handleMessage(Message msg) {
             if (msg.what == 999) {
-                final User user = SaveUserUtil.loadAccount(CreateAlbumActivity.this);
-                uploadImg(user.getUid(),str_content,rbPrivate.isChecked());
-//                final User user = SaveUserUtil.loadAccount(CreateAlbumActivity.this);
-//                String authorization = user.getUsername()+"_"+user.getToken();
-//                ll_enter.setEnabled(false);
-//                int image_size = 0;
-//                List<FileModel> list= new ArrayList<>();
-//                String strs = "";
-//                if (mSelectPath != null && mSelectPath.size() > 0) {
-//                    image_size = mSelectPath.size();
-//                    for (int i = 0; i < mSelectPath.size(); i++) {
-//                        byte[] b = null;
-//                        if(isYuantu){
-//                            b = image2byte(mSelectPath.get(i));
-//                        }else{
-//                            ByteArrayOutputStream stream = new ByteArrayOutputStream();
-//                            ImageCompressUtils.getimage(mSelectPath.get(i)).compress(Bitmap.CompressFormat.PNG,
-//                                    80, stream);
-//                            b = stream.toByteArray();
-//                        }
-//                        // 将图片流以字符串形式存储下来
-//                        String file = new String(Base64Coder.encodeLines(b));
-//                        String filename = user.getUsername()+ "_" + new SimpleDateFormat("yyyyMMdd_HHmmss").format(new Date())+"_"+  genImageName() + ".jpg";
-//                        FileModel model = new FileModel();
-//                        model.setFile(file);
-//                        model.setName(filename);
-//                        list.add(model);
-//                    }
-//                }
-//                Gson gson = new Gson();
-//                createAlbum(str_content,rbPrivate.isChecked(),image_size,authorization,gson.toJson(list));
+                assemblyParameters(str_content,rbPrivate.isChecked());
+            }else{
+                System.out.println("===============msg.arg1"+msg.arg1);
+                MainGridAdapter.Viewholder viewholder = mainGridAdapter.getViewholders(msg.arg1);
+                ((UploadImageView)viewholder.getImage()).updatePercent(msg.what);
             }
         }
     };
-    public byte[] image2byte(String path){
-        byte[] data = null;
-        FileInputStream input = null;
-        try {
-            input = new FileInputStream(new File(path));
-            ByteArrayOutputStream output = new ByteArrayOutputStream();
-            byte[] buf = new byte[1024];
-            int numBytesRead = 0;
-            while ((numBytesRead = input.read(buf)) != -1) {
-                output.write(buf, 0, numBytesRead);
-            }
-            data = output.toByteArray();
-            output.close();
-            input.close();
-        }
-        catch (FileNotFoundException ex1) {
-            ex1.printStackTrace();
-        }
-        catch (IOException ex1) {
-            ex1.printStackTrace();
-        }
-        return data;
-    }
-
-    class FileModel{
-        private String file;
-        private String name;
-
-        public String getFile() {
-            return file;
-        }
-
-        public void setFile(String file) {
-            this.file = file;
-        }
-
-        public String getName() {
-            return name;
-        }
-
-        public void setName(String name) {
-            this.name = name;
-        }
-    }
-
-    public static String genImageName() {
-        //取当前时间的长整形值包含毫秒
-        long millis = System.currentTimeMillis();
-        //long millis = System.nanoTime();
-        //加上三位随机数
-        Random random = new Random();
-        int end3 = random.nextInt(999);
-        //如果不足三位前面补0
-        String str = millis + String.format("%03d", end3);
-
-        return str;
-    }
 
     @Override
     public void onActivityResult(int requestCode, int resultCode, Intent data) {
-
         if (requestCode == REQUEST_IMAGE) {
             if (resultCode == RESULT_OK) {
                 isYuantu = data.getBooleanExtra("YUANTU", false);
@@ -416,10 +332,7 @@ public class CreateAlbumActivity extends Activity implements View.OnClickListene
                 mainGridAdapter.setData(toImages(mSelectPath));
             }
         }
-
-
     }
-
 
     @Override
     public void onDismiss() {
