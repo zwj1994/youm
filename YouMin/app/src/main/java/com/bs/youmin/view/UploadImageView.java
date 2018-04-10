@@ -31,12 +31,11 @@ public class UploadImageView extends android.support.v7.widget.AppCompatImageVie
         mPaint = new Paint();
         mPaint.setColor(mColor);
     }
-
     @Override
     protected void onDraw(Canvas canvas) {
-        super.onDraw(canvas);
-        System.out.println("==================onDraw="+mPercent);
-        canvas.drawRect(0, 0, getWidth(), getHeight() * (100 - mPercent) / 100, mPaint);
+            super.onDraw(canvas);
+//            System.out.println("==================onDraw="+mPercent);
+            canvas.drawRect(0, 0, getWidth(), getHeight() * (100 - mPercent) / 100, mPaint);
     }
 
     public void updatePercent(int percent) {

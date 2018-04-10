@@ -39,11 +39,9 @@ public class MainGridAdapter extends BaseAdapter {
         mInflater = (LayoutInflater) context.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
         mItemLayoutParams = new GridView.LayoutParams(GridView.LayoutParams.MATCH_PARENT, GridView.LayoutParams.MATCH_PARENT);
         number=n;
-
     }
 
     public void setData(List<Image> images) {
-
         if (images != null && images.size() > 0) {
             mImages = images;
         } else {
@@ -90,6 +88,7 @@ public class MainGridAdapter extends BaseAdapter {
 
     @Override
     public View getView(int position, View convertView, ViewGroup parent) {
+        System.out.println("position="+position);
         if (mImages.size() != number && position >= mImages.size()) {
             convertView = mInflater.inflate(R.layout.grid_item_add, parent, false);
             convertView.setTag(null);
@@ -98,15 +97,16 @@ public class MainGridAdapter extends BaseAdapter {
             if (convertView == null) {
                 convertView = mInflater.inflate(R.layout.grid_item_image, parent, false);
                 viewholder = new Viewholder(convertView);
-            } else {
+                System.out.println("=====position1="+position);
+            }else{
                 viewholder = (Viewholder) convertView.getTag();
                 if (viewholder == null) {
                     convertView = mInflater.inflate(R.layout.grid_item_image, parent, false);
                     viewholder = new Viewholder(convertView);
+                    System.out.println("=====position2="+position);
                 }
             }
             if (viewholder != null) {
-                System.out.println("============================position>="+position);
                 viewholder.bindData(getItem(position));
                 viewholders.put(position,viewholder);
             }

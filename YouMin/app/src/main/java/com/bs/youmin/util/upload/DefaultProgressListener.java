@@ -20,7 +20,7 @@ public class DefaultProgressListener implements ProgressListener {
 
     @Override
     public void onProgress(long hasWrittenLen, long totalLen, boolean hasFinish) {
-        System.out.println("----the current " + hasWrittenLen + "----" + totalLen + "-----" + (hasWrittenLen * 100 / totalLen));
+//        System.out.println("----the current " + hasWrittenLen + "----" + totalLen + "-----" + (hasWrittenLen * 100 / totalLen));
 
         int percent = (int) (hasWrittenLen * 100 / totalLen);
         if (percent > 100) percent = 100;

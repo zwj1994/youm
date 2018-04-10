@@ -191,8 +191,6 @@ public class CreateAlbumActivity extends Activity implements View.OnClickListene
         });
         ll_back.setOnClickListener(this);
         ll_enter.setOnClickListener(this);
-        //rl_location.setOnClickListener(this);
-
     }
 
     /**
