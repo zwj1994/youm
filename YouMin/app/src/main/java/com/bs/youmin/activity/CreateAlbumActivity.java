@@ -315,7 +315,7 @@ public class CreateAlbumActivity extends Activity implements View.OnClickListene
                 assemblyParameters(str_content,rbPrivate.isChecked());
             }else{
                 System.out.println("===============msg.arg1"+msg.arg1);
-                MainGridAdapter.Viewholder viewholder = mainGridAdapter.getViewholders(msg.arg1);
+                MainGridAdapter.Viewholder viewholder = mainGridAdapter.getViewholders(msg.arg1+1);
                 ((UploadImageView)viewholder.getImage()).updatePercent(msg.what);
             }
         }
@@ -345,6 +345,7 @@ public class CreateAlbumActivity extends Activity implements View.OnClickListene
         for (int i = 0; i < mmSelectPath.size(); i++) {
             Image image = new Image();
             image.path = mmSelectPath.get(i);
+            image.index = i;
             images.add(image);
         }
         return images;

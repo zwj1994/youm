@@ -7,6 +7,7 @@ import android.view.ViewGroup;
 import android.widget.BaseAdapter;
 import android.widget.GridView;
 import android.widget.ImageView;
+import android.widget.TextView;
 
 import com.squareup.picasso.Callback;
 import com.squareup.picasso.Picasso;
@@ -25,7 +26,7 @@ import me.nereo.multi_image_selector.bean.Image;
  */
 public class MainGridAdapter extends BaseAdapter {
     private List<Image> mImages = new ArrayList<>();
-    private Map<Integer,Viewholder> viewholders = new HashMap<>();
+    private List<Viewholder> viewholders = new ArrayList<>();
     private LayoutInflater mInflater;
     private Context mContext;
     private Callback mCallback;
@@ -107,8 +108,7 @@ public class MainGridAdapter extends BaseAdapter {
                 }
             }
             if (viewholder != null) {
-                viewholder.bindData(getItem(position));
-                viewholders.put(position,viewholder);
+                viewholder.bindData(getItem(position),position);
             }
         }
         GridView.LayoutParams lp = (GridView.LayoutParams) convertView.getLayoutParams();
@@ -129,6 +129,7 @@ public class MainGridAdapter extends BaseAdapter {
     public class Viewholder {
         ImageView image;
         ImageView indicator;
+        TextView index;
 
         public ImageView getImage() {
             return image;
@@ -144,13 +145,13 @@ public class MainGridAdapter extends BaseAdapter {
 
         Viewholder(View view) {
 
-
+            index = (TextView) view.findViewById(R.id.grid_item_index);
             image = (ImageView) view.findViewById(R.id.grid_item_image);
             indicator = (ImageView) view.findViewById(R.id.grid_item_delete);
             view.setTag(this);
         }
 
-        void bindData(final Image data) {
+        void bindData(final Image data,int index1) {
             indicator.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
@@ -160,6 +161,9 @@ public class MainGridAdapter extends BaseAdapter {
             if (data == null) {
                 return;
             }
+            System.out.println("data.index="+data.index);
+            index.setText(index1+"");
+            viewholders.add(index1,this);
             File imageFile = new File(data.path);
 
             Picasso.with(mContext)

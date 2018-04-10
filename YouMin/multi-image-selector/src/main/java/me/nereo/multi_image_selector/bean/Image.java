@@ -5,14 +5,16 @@ package me.nereo.multi_image_selector.bean;
  * Created by Nereo on 2015/4/7.
  */
 public class Image {
+    public int index;
     public String path;
     public String name;
     public long time;
 
-    public Image(String path, String name, long time) {
+    public Image(String path, String name, long time,int index) {
         this.path = path;
         this.name = name;
         this.time = time;
+        this.index = index;
     }
 
     public Image() {
