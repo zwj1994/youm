@@ -39,31 +39,22 @@ import com.bs.youmin.util.PhotoSelectedHelper;
 import com.bs.youmin.util.SaveUserUtil;
 import com.bs.youmin.util.upload.DefaultProgressListener;
 import com.bs.youmin.util.upload.UploadFileRequestBody;
-import com.bs.youmin.util.upload.UploadService;
 import com.bs.youmin.view.UploadImageView;
 import com.squareup.picasso.Callback;
 import com.squareup.picasso.Picasso;
 import java.io.ByteArrayOutputStream;
 import java.io.File;
-import java.io.FileInputStream;
-import java.io.FileNotFoundException;
-import java.io.IOException;
 import java.util.ArrayList;
-import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.Random;
 import java.util.concurrent.TimeUnit;
-
 import me.nereo.multi_image_selector.MultiImageSelectorActivity;
 import me.nereo.multi_image_selector.adapter.MainGridAdapter;
 import me.nereo.multi_image_selector.bean.Image;
 import okhttp3.MediaType;
 import okhttp3.OkHttpClient;
 import okhttp3.RequestBody;
-import okhttp3.ResponseBody;
-import okio.BufferedSink;
 import retrofit2.Call;
 import retrofit2.Response;
 import retrofit2.Retrofit;
@@ -76,13 +67,11 @@ public class CreateAlbumActivity extends Activity implements View.OnClickListene
     private ApiImp apiImp;
     LinearLayout ll_back;
     LinearLayout ll_enter;
-    boolean cb_bool = false;
     EditText et_content;
     PhotoViewAttacher mAttacher;
     RadioButton rbPublic;
     RadioButton rbPrivate;
     CheckBox cbIsYuanTu;
-
 
     GridView mGridView;
     MainGridAdapter mainGridAdapter;
@@ -92,10 +81,8 @@ public class CreateAlbumActivity extends Activity implements View.OnClickListene
     ImageView popImageView;
 
     String str_content;
-    String location;
     PhotoSelectedHelper mPhotoSelectedHelper;
     Intent intent;
-    public User user;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -104,7 +91,6 @@ public class CreateAlbumActivity extends Activity implements View.OnClickListene
         setContentView(R.layout.activity_create_album);
         mPhotoSelectedHelper = new PhotoSelectedHelper(this);
         intent = getIntent();
-        user = (User) intent.getSerializableExtra("user");
         initialView();
         initialPopups();
     }
@@ -198,7 +184,6 @@ public class CreateAlbumActivity extends Activity implements View.OnClickListene
      */
     private void initialPopups() {
         popImageView = new ImageView(this);
-        // popImageView.setPadding(50, 50, 50, 50);
         popupWindow = new PopupWindow(popImageView, ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.MATCH_PARENT);
         popupWindow.setBackgroundDrawable(new ColorDrawable(0xb0000000));
 
@@ -314,8 +299,7 @@ public class CreateAlbumActivity extends Activity implements View.OnClickListene
             if (msg.what == 999) {
                 assemblyParameters(str_content,rbPrivate.isChecked());
             }else{
-                System.out.println("===============msg.arg1"+msg.arg1);
-                MainGridAdapter.Viewholder viewholder = mainGridAdapter.getViewholders(msg.arg1+1);
+                MainGridAdapter.Viewholder viewholder = mainGridAdapter.getViewholders(msg.arg1 + 1);
                 ((UploadImageView)viewholder.getImage()).updatePercent(msg.what);
             }
         }
@@ -325,8 +309,10 @@ public class CreateAlbumActivity extends Activity implements View.OnClickListene
     public void onActivityResult(int requestCode, int resultCode, Intent data) {
         if (requestCode == REQUEST_IMAGE) {
             if (resultCode == RESULT_OK) {
-                isYuantu = data.getBooleanExtra("YUANTU", false);
+//                isYuantu = data.getBooleanExtra("YUANTU", false);
                 mSelectPath = data.getStringArrayListExtra(MultiImageSelectorActivity.EXTRA_RESULT);
+                for(String str : mSelectPath){
+                }
                 mainGridAdapter.setData(toImages(mSelectPath));
             }
         }
@@ -345,7 +331,6 @@ public class CreateAlbumActivity extends Activity implements View.OnClickListene
         for (int i = 0; i < mmSelectPath.size(); i++) {
             Image image = new Image();
             image.path = mmSelectPath.get(i);
-            image.index = i;
             images.add(image);
         }
         return images;

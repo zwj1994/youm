@@ -316,7 +316,6 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
 
     @Override
     public void onActivityResult(int requestCode, int resultCode, Intent data) {
-        L.i("=====onActivityResult==========================="+resultCode);
         if (resultCode == 666) {
             if (myAlbumFragment != null) {
                 myAlbumFragment.update();

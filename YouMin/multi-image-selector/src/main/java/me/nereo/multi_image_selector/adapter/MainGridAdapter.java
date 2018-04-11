@@ -74,7 +74,7 @@ public class MainGridAdapter extends BaseAdapter {
         if (mImages.size() == number) {
             return mImages.size();
         }
-        return mImages.size() + 1;
+        return mImages.size()+1;
     }
 
     @Override
@@ -89,7 +89,6 @@ public class MainGridAdapter extends BaseAdapter {
 
     @Override
     public View getView(int position, View convertView, ViewGroup parent) {
-        System.out.println("position="+position);
         if (mImages.size() != number && position >= mImages.size()) {
             convertView = mInflater.inflate(R.layout.grid_item_add, parent, false);
             convertView.setTag(null);
@@ -98,13 +97,11 @@ public class MainGridAdapter extends BaseAdapter {
             if (convertView == null) {
                 convertView = mInflater.inflate(R.layout.grid_item_image, parent, false);
                 viewholder = new Viewholder(convertView);
-                System.out.println("=====position1="+position);
             }else{
                 viewholder = (Viewholder) convertView.getTag();
                 if (viewholder == null) {
                     convertView = mInflater.inflate(R.layout.grid_item_image, parent, false);
                     viewholder = new Viewholder(convertView);
-                    System.out.println("=====position2="+position);
                 }
             }
             if (viewholder != null) {
@@ -151,7 +148,7 @@ public class MainGridAdapter extends BaseAdapter {
             view.setTag(this);
         }
 
-        void bindData(final Image data,int index1) {
+        void bindData(final Image data,int position) {
             indicator.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
@@ -161,9 +158,8 @@ public class MainGridAdapter extends BaseAdapter {
             if (data == null) {
                 return;
             }
-            System.out.println("data.index="+data.index);
-            index.setText(index1+"");
-            viewholders.add(index1,this);
+            index.setText(position + "");
+            viewholders.add(this);
             File imageFile = new File(data.path);
 
             Picasso.with(mContext)

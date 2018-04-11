@@ -466,7 +466,7 @@ public class MultiImageSelectorFragment extends Fragment {
                         String path = data.getString(data.getColumnIndexOrThrow(IMAGE_PROJECTION[0]));
                         String name = data.getString(data.getColumnIndexOrThrow(IMAGE_PROJECTION[1]));
                         long dateTime = data.getLong(data.getColumnIndexOrThrow(IMAGE_PROJECTION[2]));
-                        Image image = new Image(path, name, dateTime,0);
+                        Image image = new Image(path, name, dateTime);
                         images.add(image);
                         if (!hasFolderGened) {
                             // 获取文件夹名称

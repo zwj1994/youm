@@ -1,13 +1,26 @@
 package com.bs.youmin.fragment;
 
+import android.Manifest;
 import android.animation.AnimatorInflater;
 import android.animation.AnimatorSet;
+import android.app.Activity;
+import android.app.AlertDialog;
+import android.content.Context;
+import android.content.DialogInterface;
 import android.content.Intent;
+import android.content.pm.PackageInfo;
+import android.content.pm.PackageManager;
+import android.net.Uri;
+import android.os.Build;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Message;
+import android.provider.Settings;
+import android.support.annotation.NonNull;
 import android.support.design.widget.FloatingActionButton;
+import android.support.v4.app.ActivityCompat;
 import android.support.v4.app.Fragment;
+import android.support.v4.content.ContextCompat;
 import android.support.v4.widget.SwipeRefreshLayout;
 import android.util.Log;
 import android.view.LayoutInflater;
@@ -26,7 +39,9 @@ import android.widget.Toast;
 
 import com.bs.youmin.R;
 import com.bs.youmin.activity.AlbumRankingActivity;
+import com.bs.youmin.activity.BaseActivity;
 import com.bs.youmin.activity.CreateAlbumActivity;
+import com.bs.youmin.activity.MainActivity;
 import com.bs.youmin.adapter.AlbumRankingListAdapter;
 import com.bs.youmin.entity.Ip;
 import com.bs.youmin.entity.User;
@@ -284,6 +299,18 @@ public class MyAlbumFragment extends Fragment implements View.OnClickListener, S
             fab[i].setOnClickListener(this);
         }
     }
+
+    String[] permissions = new String[]{
+            Manifest.permission.CAMERA,
+            Manifest.permission.READ_EXTERNAL_STORAGE,
+            Manifest.permission.WRITE_EXTERNAL_STORAGE
+    };
+    // 声明一个集合，在后面的代码中用来存储用户拒绝授权的权
+    List<String> mPermissionList = new ArrayList<>();
+
+    private static final int MY_PERMISSIONS_REQUEST_CALL_PHONE = 1;
+    private static final int MY_PERMISSIONS_REQUEST_CALL_CAMERA = 2;
+
     @Override
     public void onClick(View v) {
         switch (v.getId()) {
@@ -312,14 +339,60 @@ public class MyAlbumFragment extends Fragment implements View.OnClickListener, S
                 hideFABMenu();
                 break;
             case R.id.miniFab03:
-                Intent intent = new Intent(getActivity(), CreateAlbumActivity.class);
-                startActivityForResult(intent,1);
-                hideFABMenu();
+                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
+                    mPermissionList.clear();
+                    for (int i = 0; i < permissions.length; i++) {
+                        if (ContextCompat.checkSelfPermission(getActivity(), permissions[i]) != PackageManager.PERMISSION_GRANTED) {
+                            mPermissionList.add(permissions[i]);
+                        }
+                    }
+                    if (mPermissionList.isEmpty()) {//未授予的权限为空，表示都授予了
+                        Intent intent = new Intent(getActivity(), CreateAlbumActivity.class);
+                        startActivityForResult(intent,1);
+                        hideFABMenu();
+                    } else {//请求权限方法
+                        Toast.makeText(getActivity(),"权限申请未通过您的确认，请前往设置",Toast.LENGTH_LONG).show();
+                        String[] permissions = mPermissionList.toArray(new String[mPermissionList.size()]);//将List转为数组
+                        ActivityCompat.requestPermissions(getActivity(), permissions, MY_PERMISSIONS_REQUEST_CALL_CAMERA);
+                    }
+                }else{
+                    Intent intent = new Intent(getActivity(), CreateAlbumActivity.class);
+                    startActivityForResult(intent,1);
+                    hideFABMenu();
+                }
                 break;
             default:
                 break;
         }
     }
+
+    @Override
+    public void onRequestPermissionsResult(int requestCode, String[] permissions, int[] grantResults) {
+
+        if (requestCode == MY_PERMISSIONS_REQUEST_CALL_PHONE) {
+            if (grantResults[0] == PackageManager.PERMISSION_GRANTED) {
+                showToast("权限已申请");
+            } else {
+                showToast("权限已拒绝");
+            }
+        }else if (requestCode == MY_PERMISSIONS_REQUEST_CALL_CAMERA){
+            for (int i = 0; i < grantResults.length; i++) {
+                if (grantResults[i] != PackageManager.PERMISSION_GRANTED) {
+                    //判断是否勾选禁止后不再询问
+                    boolean showRequestPermission = ActivityCompat.shouldShowRequestPermissionRationale(getActivity(), permissions[i]);
+                    if (showRequestPermission) {
+                        showToast("权限未申请");
+                    }
+                }
+            }
+        }
+        super.onRequestPermissionsResult(requestCode, permissions, grantResults);
+    }
+
+    private void showToast(String string){
+        Toast.makeText(getActivity(),string,Toast.LENGTH_LONG).show();
+    }
+
     private void hideFABMenu(){
         rlAddBill.setVisibility(View.GONE);
         fab01Add.setImageResource(R.drawable.icon_add_btn);
@@ -349,5 +422,7 @@ public class MyAlbumFragment extends Fragment implements View.OnClickListener, S
 //        loadData(true);
 //        mRefreshLayout.setLoading(false);
 //    }
+
+
 
 }
