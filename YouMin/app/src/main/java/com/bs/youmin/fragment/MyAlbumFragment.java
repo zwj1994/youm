@@ -321,16 +321,16 @@ public class MyAlbumFragment extends Fragment implements View.OnClickListener, S
                 fab01Add.setImageResource(isAdd ? R.drawable.icon_add_btn:R.drawable.icon_add_click_btn);
                 isAdd = !isAdd;
                 rlAddBill.setVisibility(isAdd ? View.VISIBLE : View.GONE);
-                if (isAdd) {
-                    addBillTranslate1.setTarget(ll[0]);
-                    addBillTranslate1.start();
-                    addBillTranslate2.setTarget(ll[1]);
-                    addBillTranslate2.setStartDelay(150);
-                    addBillTranslate2.start();
-                    addBillTranslate3.setTarget(ll[2]);
-                    addBillTranslate3.setStartDelay(200);
-                    addBillTranslate3.start();
-                }
+//                if (isAdd) {
+//                    addBillTranslate1.setTarget(ll[0]);
+//                    addBillTranslate1.start();
+//                    addBillTranslate2.setTarget(ll[1]);
+//                    addBillTranslate2.setStartDelay(150);
+//                    addBillTranslate2.start();
+//                    addBillTranslate3.setTarget(ll[2]);
+//                    addBillTranslate3.setStartDelay(200);
+//                    addBillTranslate3.start();
+//                }
                 break;
             case R.id.miniFab01:
                 hideFABMenu();
