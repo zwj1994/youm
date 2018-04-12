@@ -66,7 +66,7 @@ public class AlbumRankingListAdapter extends BaseAdapter {
         }
         model = mList.get(i);
         GlideUtils.loadImageCrop(mContext, model.getaCover(), viewHolder.iv_category_list_icon);
-        viewHolder.tv_category_list_name.setText(model.getaName());
+        viewHolder.tv_category_list_name.setText(model.getaName() + " ");
         viewHolder.tv_category_love_count.setText(model.getLikecount()+"");
         return view;
     }

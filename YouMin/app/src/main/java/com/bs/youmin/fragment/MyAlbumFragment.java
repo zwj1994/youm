@@ -1,57 +1,35 @@
 package com.bs.youmin.fragment;
 
 import android.Manifest;
-import android.animation.AnimatorInflater;
-import android.animation.AnimatorSet;
-import android.app.Activity;
-import android.app.AlertDialog;
-import android.content.Context;
-import android.content.DialogInterface;
 import android.content.Intent;
-import android.content.pm.PackageInfo;
 import android.content.pm.PackageManager;
-import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Message;
-import android.provider.Settings;
-import android.support.annotation.NonNull;
 import android.support.design.widget.FloatingActionButton;
 import android.support.v4.app.ActivityCompat;
-import android.support.v4.app.Fragment;
 import android.support.v4.content.ContextCompat;
-import android.support.v4.widget.SwipeRefreshLayout;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.AbsListView;
 import android.widget.AdapterView;
-import android.widget.ArrayAdapter;
-import android.widget.Button;
 import android.widget.LinearLayout;
 import android.widget.ListView;
-import android.widget.ProgressBar;
-import android.widget.RelativeLayout;
 import android.widget.TextView;
-import android.widget.Toast;
 
 import com.bs.youmin.R;
 import com.bs.youmin.activity.AlbumRankingActivity;
-import com.bs.youmin.activity.BaseActivity;
 import com.bs.youmin.activity.CreateAlbumActivity;
-import com.bs.youmin.activity.MainActivity;
 import com.bs.youmin.adapter.AlbumRankingListAdapter;
 import com.bs.youmin.entity.Ip;
 import com.bs.youmin.entity.User;
 import com.bs.youmin.entity.YAlbum;
 import com.bs.youmin.imp.ApiImp;
-import com.bs.youmin.model.ResultStatus;
+import com.bs.youmin.imp.YmCallBack;
 import com.bs.youmin.util.L;
 import com.bs.youmin.util.SaveUserUtil;
-import com.demievil.library.RefreshLayout;
-import com.squareup.picasso.Picasso;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -71,11 +49,10 @@ import retrofit2.converter.gson.GsonConverterFactory;
  *  创建时间:  2018/03/23 19:48
  *  描述：    我的
  */
-public class MyAlbumFragment extends Fragment implements View.OnClickListener, SwipeRefreshLayout.OnRefreshListener {
+public class MyAlbumFragment extends BaseFragment implements View.OnClickListener {
 
     private ApiImp apiImp;
 
-    RefreshLayout mRefreshLayout;
     private ListView mListView;
     private AlbumRankingListAdapter albumRankingListAdapter;
     private List<YAlbum> mList =  new ArrayList<>();
@@ -85,75 +62,38 @@ public class MyAlbumFragment extends Fragment implements View.OnClickListener, S
     private int page = 0;
 
     private FloatingActionButton fab01Add;
-    private boolean isAdd = false;
-    private RelativeLayout rlAddBill;
-    private int[] llId = new int[]{R.id.ll01,R.id.ll02,R.id.ll03};
-    private LinearLayout[] ll = new LinearLayout[llId.length];
-    private int[] fabId = new int[]{R.id.miniFab01,R.id.miniFab02,R.id.miniFab03};
-    private FloatingActionButton[] fab = new FloatingActionButton[fabId.length];
-    private AnimatorSet addBillTranslate1;
-    private AnimatorSet addBillTranslate2;
-    private AnimatorSet addBillTranslate3;
 
-//    private TextView tv_more;
-//    private ProgressBar pb;
-//    View footerLayout;
+    private YmCallBack callBack;
 
+    public void setCallBack(YmCallBack callBack){
+        this.callBack = callBack;
+    }
+
+    /**
+     * Handler业务处理
+     */
     private Handler mHandler = new Handler(){
         @Override
         public void handleMessage(Message msg) {
-//            tv_more.setEnabled(true);
-//            tv_more.setText("加载更多");
-//            tv_more.setVisibility(View.GONE);
-//            pb.setVisibility(View.GONE);
-//            mRefreshLayout.setRefreshing(false);
-
             ranking_load_more_tv.setText(getString(R.string.progressbar_load_more));
             load_more.setVisibility(View.GONE);
         }
     };
 
-    private LoginFragment.OnButtonClick onButtonClick;//2、定义接口成员变量
-
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.fragment_album_ranking, container, false);
         initView(view);
-        setDefaultValues();
-        bindEvents();
         return view;
     }
 
     private void initView(View view) {
-//        mRefreshLayout = (RefreshLayout) view.findViewById(R.id.fragment_myalbum_freshLayout);
         fab01Add = (FloatingActionButton)view.findViewById(R.id.fab01Add);
-        fab01Add.setVisibility(View.GONE);
-        rlAddBill = (RelativeLayout)view.findViewById(R.id.rlAddBill);
-        rlAddBill.setOnClickListener(this);
-
-        for (int i = 0; i < llId.length;i++){
-            ll[i] = (LinearLayout)view.findViewById(llId[i]);
-        }
-        for (int i = 0;i < fabId.length; i++){
-            fab[i] = (FloatingActionButton)view.findViewById(fabId[i]);
-        }
-//        footerLayout = getActivity().getLayoutInflater().inflate(R.layout.list_item_more, null);
-//        tv_more = (TextView) footerLayout.findViewById(R.id.text_more);
-//        pb = (ProgressBar) footerLayout.findViewById(R.id.load_progress_bar);
+        fab01Add.setOnClickListener(this);
 
         load_more = (LinearLayout) view.findViewById(R.id.ranking_load_more);
         ranking_load_more_tv = (TextView) view.findViewById(R.id.ranking_load_more_tv);
         mListView = (ListView) view.findViewById(R.id.mListView);
-//        mListView.addFooterView(footerLayout);
-
-//        mRefreshLayout.setOnRefreshListener(this);
-//        mRefreshLayout.setOnLoadListener(this);
-
-//        mRefreshLayout.setChildView(mListView);
-//        mRefreshLayout.setColorSchemeResources(android.R.color.holo_blue_bright,
-//                android.R.color.holo_green_dark,
-//                android.R.color.holo_red_light,
-//                android.R.color.holo_orange_dark);
 
         /**
          * 监听列表滑动到最后
@@ -178,33 +118,25 @@ public class MyAlbumFragment extends Fragment implements View.OnClickListener, S
                 }
             }
         });
-
-
         /**
          * 列表Item单击事件
          */
         mListView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
             public void onItemClick(AdapterView<?> adapterView, View view, int i, long l) {
-                if(view.getId() == R.id.footer_layout){
-//                    tv_more.setVisibility(View.GONE);
-//                    pb.setVisibility(View.VISIBLE);
-//                    loadData(false);
-                }else{
-                    Intent intent = new Intent(getActivity(), AlbumRankingActivity.class);
-                    intent.putExtra("name",mList.get(i).getaName());
-                    intent.putExtra("aId",mList.get(i).getaId());
-                    startActivity(intent);
-                }
-
+                Intent intent = new Intent(getActivity(), AlbumRankingActivity.class);
+                intent.putExtra("name",mList.get(i).getaName());
+                intent.putExtra("aId",mList.get(i).getaId());
+                startActivity(intent);
             }
         });
-
         loadData(true);
     }
 
+    /**
+     * 更新列表数据
+     */
     public void update() {
-        L.i("==========update");
         loadData(true);
     }
 
@@ -242,21 +174,26 @@ public class MyAlbumFragment extends Fragment implements View.OnClickListener, S
                     mHandler.sendEmptyMessageDelayed(1,300);
                 }else if(response.code() == HttpStatus.SC_UNAUTHORIZED){
                      fab01Add.setVisibility(View.GONE);
-                    if(onButtonClick!=null){
-                        onButtonClick.onClick(load_more);
+                    if(callBack != null){
+                        callBack.work(0);
                     }
-                    Toast.makeText(getActivity(), "您还没有登录，请先登录",Toast.LENGTH_SHORT).show();
+                     showToast("您还没有登录，请先登录");
                 }
             }
 
             @Override
             public void onFailure(Call<List<YAlbum>> call, Throwable t) {
+                showToast("网络状况不佳");
                 L.i(t.toString());
             }
         });
     }
 
-    //解析
+    /**
+     * 解析数据
+     * @param list
+     * @param loadFirst
+     */
     private void parsingJson(List<YAlbum> list,final boolean loadFirst) {
         if(loadFirst){
             mList = new ArrayList<>();
@@ -266,102 +203,17 @@ public class MyAlbumFragment extends Fragment implements View.OnClickListener, S
         mListView.setAdapter(albumRankingListAdapter);
     }
 
-    //定义接口变量的get方法
-    public LoginFragment.OnButtonClick getOnButtonClick() {
-        return onButtonClick;
-    }
-    //定义接口变量的set方法
-    public void setOnButtonClick(LoginFragment.OnButtonClick onButtonClick) {
-        this.onButtonClick = onButtonClick;
-    }
-
-    @Override
-    public void onRefresh() {
-        loadData(true);
-        mRefreshLayout.setLoading(false);
-    }
-
-
-    //1、定义接口
-    public interface OnButtonClick{
-        public void onClick(View view);
-    }
-
-
-    private void setDefaultValues(){
-        addBillTranslate1 = (AnimatorSet) AnimatorInflater.loadAnimator(getActivity(),R.anim.add_bill_anim);
-        addBillTranslate2 = (AnimatorSet) AnimatorInflater.loadAnimator(getActivity(),R.anim.add_bill_anim);
-        addBillTranslate3 = (AnimatorSet) AnimatorInflater.loadAnimator(getActivity(),R.anim.add_bill_anim);
-    }
-    private void bindEvents(){
-        fab01Add.setOnClickListener(this);
-        for (int i = 0;i < fabId.length; i++){
-            fab[i].setOnClickListener(this);
-        }
-    }
-
-    String[] permissions = new String[]{
-            Manifest.permission.CAMERA,
-            Manifest.permission.READ_EXTERNAL_STORAGE,
-            Manifest.permission.WRITE_EXTERNAL_STORAGE
-    };
-    // 声明一个集合，在后面的代码中用来存储用户拒绝授权的权
-    List<String> mPermissionList = new ArrayList<>();
-
-    private static final int MY_PERMISSIONS_REQUEST_CALL_PHONE = 1;
-    private static final int MY_PERMISSIONS_REQUEST_CALL_CAMERA = 2;
-
     @Override
     public void onClick(View v) {
         switch (v.getId()) {
-            case R.id.rlAddBill:
-                hideFABMenu();
-                break;
             case R.id.fab01Add:
-                fab01Add.setImageResource(isAdd ? R.drawable.icon_add_btn:R.drawable.icon_add_click_btn);
-                isAdd = !isAdd;
-                rlAddBill.setVisibility(isAdd ? View.VISIBLE : View.GONE);
-//                if (isAdd) {
-//                    addBillTranslate1.setTarget(ll[0]);
-//                    addBillTranslate1.start();
-//                    addBillTranslate2.setTarget(ll[1]);
-//                    addBillTranslate2.setStartDelay(150);
-//                    addBillTranslate2.start();
-//                    addBillTranslate3.setTarget(ll[2]);
-//                    addBillTranslate3.setStartDelay(200);
-//                    addBillTranslate3.start();
-//                }
-                break;
-            case R.id.miniFab01:
-                hideFABMenu();
-                break;
-            case R.id.miniFab02:
-                hideFABMenu();
-                break;
-            case R.id.miniFab03:
-                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
-                    mPermissionList.clear();
-                    for (int i = 0; i < permissions.length; i++) {
-                        if (ContextCompat.checkSelfPermission(getActivity(), permissions[i]) != PackageManager.PERMISSION_GRANTED) {
-                            mPermissionList.add(permissions[i]);
-                        }
-                    }
-                    if (mPermissionList.isEmpty()) {//未授予的权限为空，表示都授予了
+                toGrantAuthorization(new AuthorizationCallBack(){
+                    @Override
+                    public void work() {
                         Intent intent = new Intent(getActivity(), CreateAlbumActivity.class);
                         startActivityForResult(intent,1);
-                        hideFABMenu();
-                    } else {//请求权限方法
-                        Toast.makeText(getActivity(),"权限申请未通过您的确认，请前往设置",Toast.LENGTH_LONG).show();
-                        String[] permissions = mPermissionList.toArray(new String[mPermissionList.size()]);//将List转为数组
-                        ActivityCompat.requestPermissions(getActivity(), permissions, MY_PERMISSIONS_REQUEST_CALL_CAMERA);
                     }
-                }else{
-                    Intent intent = new Intent(getActivity(), CreateAlbumActivity.class);
-                    startActivityForResult(intent,1);
-                    hideFABMenu();
-                }
-                break;
-            default:
+                });
                 break;
         }
     }
@@ -389,40 +241,45 @@ public class MyAlbumFragment extends Fragment implements View.OnClickListener, S
         super.onRequestPermissionsResult(requestCode, permissions, grantResults);
     }
 
-    private void showToast(String string){
-        Toast.makeText(getActivity(),string,Toast.LENGTH_LONG).show();
-    }
+    // 权限申请列表
+    String[] permissions = new String[]{
+            Manifest.permission.CAMERA,
+            Manifest.permission.READ_EXTERNAL_STORAGE,
+            Manifest.permission.WRITE_EXTERNAL_STORAGE
+    };
 
-    private void hideFABMenu(){
-        rlAddBill.setVisibility(View.GONE);
-        fab01Add.setImageResource(R.drawable.icon_add_btn);
-        isAdd = false;
-    }
+    // 声明一个集合，在后面的代码中用来存储用户拒绝授权的权
+    List<String> mPermissionList = new ArrayList<>();
 
-//    @Override
-//    public void onLoad() {
-//        L.i("============onLoad");
-//        if (news_size == mlist.size()) {
-//            tv_more.setText("数据已加载完毕");
-//            tv_more.setEnabled(false);
-//            return;
-//        }
-//        tv_more.setVisibility(View.GONE);
-//        pb.setVisibility(View.VISIBLE);
-//        ranking_load_more_tv.setText(getString(R.string.progressbar_load_more));
-//        load_more.setVisibility(View.VISIBLE);
-//        loadData(false);
-//    }
+    private static final int MY_PERMISSIONS_REQUEST_CALL_PHONE = 1;
+    private static final int MY_PERMISSIONS_REQUEST_CALL_CAMERA = 2;
 
     /**
-     * 下拉刷新方法
+     * 授权
+     * @param callBack
      */
-//    @Override
-//    public void onRefresh() {
-//        loadData(true);
-//        mRefreshLayout.setLoading(false);
-//    }
+    private void toGrantAuthorization(AuthorizationCallBack callBack){
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
+            mPermissionList.clear();
+            for (int i = 0; i < permissions.length; i++) {
+                if (ContextCompat.checkSelfPermission(getActivity(), permissions[i]) != PackageManager.PERMISSION_GRANTED) {
+                    mPermissionList.add(permissions[i]);
+                }
+            }
+            if (mPermissionList.isEmpty()) {//未授予的权限为空，表示都授予了
+                callBack.work();
+            } else {//请求权限方法
+                showToast("请允许相关权限");
+                String[] permissions = mPermissionList.toArray(new String[mPermissionList.size()]);//将List转为数组
+                ActivityCompat.requestPermissions(getActivity(), permissions, MY_PERMISSIONS_REQUEST_CALL_CAMERA);
+            }
+        }else{
+            callBack.work();
+        }
+    }
 
-
+    interface AuthorizationCallBack{
+        void work();
+    }
 
 }

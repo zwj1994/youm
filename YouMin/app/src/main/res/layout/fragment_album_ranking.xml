@@ -9,23 +9,13 @@ android:layout_height="match_parent"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:orientation="vertical">
-
-        <!--<com.demievil.library.RefreshLayout-->
-            <!--android:id="@+id/fragment_myalbum_freshLayout"-->
-            <!--android:layout_width="match_parent"-->
-            <!--android:layout_height="wrap_content"-->
-            <!--android:background="#ffffff"-->
-            <!--&gt;-->
-            <ListView
-                android:id="@+id/mListView"
-                android:layout_width="match_parent"
-                android:layout_height="0dp"
-                android:layout_weight="1"
-                android:numColumns="2"
-                />
-
-        <!--</com.demievil.library.RefreshLayout>-->
-
+        <ListView
+            android:id="@+id/mListView"
+            android:divider="@null"
+            android:layout_width="match_parent"
+            android:layout_height="0dp"
+            android:layout_weight="1"
+            android:numColumns="2"/>
         <LinearLayout
             android:visibility="gone"
             android:id="@+id/ranking_load_more"
@@ -34,12 +24,10 @@ android:layout_height="match_parent"
             android:gravity="center"
             android:orientation="vertical"
             android:padding="5dp">
-
             <ProgressBar
                 android:indeterminateDrawable="@drawable/progressbar"
                 android:layout_width="20dp"
                 android:layout_height="20dp"/>
-
             <TextView
                 android:id="@+id/ranking_load_more_tv"
                 android:layout_width="wrap_content"
@@ -47,120 +35,17 @@ android:layout_height="match_parent"
                 android:text="@string/progressbar_load_more"/>
         </LinearLayout>
     </LinearLayout>
-<RelativeLayout
-    android:id="@+id/rlAddBill"
-    android:layout_width="match_parent"
-    android:layout_height="match_parent"
-    android:background="#80000000"
-    android:visibility="gone"
-    android:clickable="true"
-    >
-    <LinearLayout
-        android:id="@+id/ll01"
-        android:layout_width="match_parent"
-        android:layout_height="50dp"
+    <android.support.design.widget.FloatingActionButton
+        android:id="@+id/fab01Add"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignParentRight="true"
         android:layout_alignParentBottom="true"
-        android:layout_marginBottom="100dp"
-        android:orientation="horizontal"
-        >
-        <TextView
-            android:layout_toLeftOf="@+id/miniFab01"
-            android:layout_width="0dp"
-            android:layout_height="wrap_content"
-            android:layout_weight="1"
-            android:text="测试2"
-            android:textSize="15sp"
-            android:layout_marginRight="10dp"
-            android:textColor="@android:color/white"
-            android:layout_gravity="center_vertical"
-            android:gravity="right"
-            android:paddingBottom="5dp"
-            />
-        <android.support.design.widget.FloatingActionButton
-            android:id="@+id/miniFab01"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:src="@mipmap/common_loading4_0"
-            android:layout_marginRight="25dp"
-            app:fabSize="mini"
-            app:elevation="5dp"
-            />
-    </LinearLayout>
-    <LinearLayout
-        android:id="@+id/ll02"
-        android:layout_width="match_parent"
-        android:layout_height="50dp"
-        android:orientation="horizontal"
-        android:layout_above="@+id/ll01"
-        android:layout_marginBottom="10dp"
-        >
-        <TextView
-            android:layout_toLeftOf="@+id/miniFab02"
-            android:layout_width="0dp"
-            android:layout_height="wrap_content"
-            android:layout_weight="1"
-            android:text="测试1"
-            android:textSize="15sp"
-            android:layout_marginRight="10dp"
-            android:textColor="@android:color/white"
-            android:layout_gravity="center_vertical"
-            android:gravity="right"
-            android:paddingBottom="5dp"
-            />
-        <android.support.design.widget.FloatingActionButton
-            android:id="@+id/miniFab02"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:src="@mipmap/common_loading4_0"
-            android:layout_marginRight="25dp"
-            app:fabSize="mini"
-            app:elevation="5dp"
-            />
-    </LinearLayout>
-    <LinearLayout
-        android:id="@+id/ll03"
-        android:layout_width="match_parent"
-        android:layout_height="50dp"
-        android:orientation="horizontal"
-        android:layout_above="@+id/ll02"
-        android:layout_marginBottom="10dp"
-        >
-        <TextView
-            android:layout_toLeftOf="@+id/miniFab02"
-            android:layout_width="0dp"
-            android:layout_height="wrap_content"
-            android:layout_weight="1"
-            android:text="秀美景"
-            android:textSize="15sp"
-            android:layout_marginRight="10dp"
-            android:textColor="@android:color/white"
-            android:layout_gravity="center_vertical"
-            android:gravity="right"
-            android:paddingBottom="5dp"
-            />
-        <android.support.design.widget.FloatingActionButton
-            android:id="@+id/miniFab03"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:src="@drawable/icon_fj_btn"
-            android:layout_marginRight="25dp"
-            app:fabSize="mini"
-            app:elevation="5dp"
-            />
-    </LinearLayout>
-</RelativeLayout>
-<android.support.design.widget.FloatingActionButton
-    android:id="@+id/fab01Add"
-    android:layout_width="wrap_content"
-    android:layout_height="wrap_content"
-    android:layout_alignParentRight="true"
-    android:layout_alignParentBottom="true"
-    android:src="@drawable/icon_add_btn"
-    android:layout_marginRight="15dp"
-    android:layout_marginBottom="20dp"
-    app:fabSize="normal"
-    app:elevation="5dp"
-    app:rippleColor="#e7d161"
-    android:visibility="gone"
-    />
+        android:src="@drawable/icon_add_btn"
+        android:layout_marginRight="15dp"
+        android:layout_marginBottom="20dp"
+        app:fabSize="normal"
+        app:elevation="5dp"
+        app:rippleColor="#e7d161"
+        android:visibility="gone"/>
 </RelativeLayout>

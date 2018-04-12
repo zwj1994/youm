@@ -49,6 +49,8 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.TimeUnit;
+
+import cz.msebera.android.httpclient.HttpStatus;
 import me.nereo.multi_image_selector.MultiImageSelectorActivity;
 import me.nereo.multi_image_selector.adapter.MainGridAdapter;
 import me.nereo.multi_image_selector.bean.Image;
@@ -94,7 +96,13 @@ public class CreateAlbumActivity extends Activity implements View.OnClickListene
         initialView();
         initialPopups();
     }
-
+    /**
+     * 显示提示信息
+     * @param msg
+     */
+    protected void showToast(String msg){
+        Toast.makeText(this,msg,Toast.LENGTH_SHORT).show();
+    }
 
     @Override
     protected void onDestroy() {
@@ -253,6 +261,11 @@ public class CreateAlbumActivity extends Activity implements View.OnClickListene
                         Toast.makeText(CreateAlbumActivity.this, "发布失败", Toast.LENGTH_SHORT).show();
                         ll_enter.setEnabled(true);
                     }
+                }else if(response.code() == HttpStatus.SC_UNAUTHORIZED){
+                    showToast("您的登录信息已过期，请重新登录");
+                    Intent intents = new Intent(CreateAlbumActivity.this, MainActivity.class);
+                    setResult(111, intents);
+                    finish();
                 }
             }
             @Override
@@ -287,6 +300,7 @@ public class CreateAlbumActivity extends Activity implements View.OnClickListene
             Toast.makeText(CreateAlbumActivity.this, "您还没有选择相片", Toast.LENGTH_SHORT).show();
             return;
         }
+        ll_enter.setEnabled(true);
         Message m = h.obtainMessage(999);
         h.sendMessage(m);
 
@@ -311,8 +325,6 @@ public class CreateAlbumActivity extends Activity implements View.OnClickListene
             if (resultCode == RESULT_OK) {
 //                isYuantu = data.getBooleanExtra("YUANTU", false);
                 mSelectPath = data.getStringArrayListExtra(MultiImageSelectorActivity.EXTRA_RESULT);
-                for(String str : mSelectPath){
-                }
                 mainGridAdapter.setData(toImages(mSelectPath));
             }
         }

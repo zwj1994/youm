@@ -29,6 +29,7 @@ import com.bs.youmin.fragment.HomePageFragment;
 import com.bs.youmin.fragment.LoginFragment;
 import com.bs.youmin.fragment.MyAlbumFragment;
 import com.bs.youmin.fragment.WeatherFragment;
+import com.bs.youmin.imp.YmCallBack;
 import com.bs.youmin.util.L;
 import com.bs.youmin.util.SaveUserUtil;
 import com.bs.youmin.view.CustomDialog;
@@ -169,10 +170,9 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
             loginFragment = new LoginFragment();
             transaction.add(R.id.main_frame_layout, loginFragment);
         }
-        loginFragment.setOnButtonClick(new LoginFragment.OnButtonClick() {
-            //3、实现接口对象的方法，
+        loginFragment.setYmCallBack(new YmCallBack() {
             @Override
-            public void onClick(View view) {
+            public void work(int arg) {
                 initMyAlbum();
                 initUserInfo();
             }
@@ -241,10 +241,9 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
             myAlbumFragment = new MyAlbumFragment();
             transaction.add(R.id.main_frame_layout, myAlbumFragment);
         }
-        myAlbumFragment.setOnButtonClick(new LoginFragment.OnButtonClick() {
-            //3、实现接口对象的方法，
+        myAlbumFragment.setCallBack(new YmCallBack() {
             @Override
-            public void onClick(View view) {
+            public void work(int arg) {
                 initLogin();
                 myAlbumFragment = null;
             }
@@ -320,6 +319,8 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
             if (myAlbumFragment != null) {
                 myAlbumFragment.update();
             }
+        }else if (resultCode == 111) {
+            initLogin();
         }
 
     }

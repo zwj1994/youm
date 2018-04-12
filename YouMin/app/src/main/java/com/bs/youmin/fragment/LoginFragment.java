@@ -2,8 +2,6 @@ package com.bs.youmin.fragment;
 
 import android.content.Context;
 import android.os.Bundle;
-import android.support.v4.app.Fragment;
-import android.support.v4.app.FragmentTransaction;
 import android.text.TextUtils;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -11,12 +9,12 @@ import android.view.ViewGroup;
 import android.view.inputmethod.InputMethodManager;
 import android.widget.Button;
 import android.widget.EditText;
-import android.widget.Toast;
 
 import com.bs.youmin.R;
 import com.bs.youmin.entity.Ip;
 import com.bs.youmin.entity.User;
 import com.bs.youmin.imp.ApiImp;
+import com.bs.youmin.imp.YmCallBack;
 import com.bs.youmin.model.ResultModel;
 import com.bs.youmin.model.ResultStatus;
 import com.bs.youmin.model.TokenModel;
@@ -38,14 +36,19 @@ import retrofit2.converter.gson.GsonConverterFactory;
  *  创建时间:  2018/03/23 19:48
  *  描述：    登录
  */
-public class LoginFragment extends Fragment {
+public class LoginFragment extends BaseFragment {
 
     private Button login_btn;
     private EditText login_input_password;
     private EditText login_input_username;
     private Button forgive_pwd;
     private ApiImp apiImp;
-    private OnButtonClick onButtonClick;//2、定义接口成员变量
+
+    private YmCallBack ymCallBack;
+    public void setYmCallBack(YmCallBack ymCallBack){
+        this.ymCallBack = ymCallBack;
+    }
+
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.activity_login, container, false);
@@ -65,11 +68,11 @@ public class LoginFragment extends Fragment {
                 String username = login_input_username.getText().toString().trim();
                 String password = login_input_password.getText().toString().trim();
                 if(TextUtils.isEmpty(username)){
-                    Toast.makeText(getActivity(),"用户名不能为空",Toast.LENGTH_SHORT).show();
+                    showToast("用户名不能为空");
                     showInput(login_input_username);
                     return;
                 }else if(TextUtils.isEmpty(password)){
-                    Toast.makeText(getActivity(),"密码不能为空",Toast.LENGTH_SHORT).show();
+                    showToast("密码不能为空");
                     showInput(login_input_password);
                     return;
                 }
@@ -98,19 +101,19 @@ public class LoginFragment extends Fragment {
                                 user.setSign(tokenModel.getSign());
                                 user.setUid(tokenModel.getuId());
                                 SaveUserUtil.saveAccount(getActivity(),user);
-                                Toast.makeText(getActivity(), resultModel.getMessage(),Toast.LENGTH_SHORT).show();
+                                showToast(resultModel.getMessage());
 
-                                if(onButtonClick!=null){
-                                    onButtonClick.onClick(login_btn);
+                                if(ymCallBack != null){
+                                    ymCallBack.work(0);
                                 }
                             }else{
-                                Toast.makeText(getActivity(), resultModel.getMessage(),Toast.LENGTH_SHORT).show();
+                                showToast(resultModel.getMessage());
                             }
                         }
                     }
                     @Override
                     public void onFailure(Call<ResultModel<TokenModel>> call, Throwable t) {
-                        Toast.makeText(getActivity(), "请求失败，请稍后再试",Toast.LENGTH_SHORT).show();
+                        showToast("请求失败，请稍后再试");
                         L.i(t.toString());
                     }
                 });
@@ -131,13 +134,13 @@ public class LoginFragment extends Fragment {
                     public void onResponse(Call<ResultModel<TokenModel>> call, Response<ResultModel<TokenModel>> response) {
                         if (response.isSuccessful()) {
                             if(ResultStatus.SUCCESS.getCode() == response.body().getCode()){
-                                Toast.makeText(getActivity(), "登出成功",Toast.LENGTH_SHORT).show();
+                                showToast("登出成功");
                             }
                         }
                     }
                     @Override
                     public void onFailure(Call<ResultModel<TokenModel>> call, Throwable t) {
-                        Toast.makeText(getActivity(), "请求失败，请稍后再试",Toast.LENGTH_SHORT).show();
+                        showToast("请求失败，请稍后再试");
                         L.i(t.toString());
                     }
                 });
@@ -154,18 +157,5 @@ public class LoginFragment extends Fragment {
         InputMethodManager imm = (InputMethodManager)getActivity().getSystemService(Context.INPUT_METHOD_SERVICE);
         imm.showSoftInput(view,0);
     }
-    //定义接口变量的get方法
-    public OnButtonClick getOnButtonClick() {
-        return onButtonClick;
-    }
-    //定义接口变量的set方法
-    public void setOnButtonClick(OnButtonClick onButtonClick) {
-        this.onButtonClick = onButtonClick;
-    }
-    //1、定义接口
-    public interface OnButtonClick{
-        public void onClick(View view);
-    }
-
 
 }
