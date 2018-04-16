@@ -43,6 +43,7 @@ import com.kymjs.rxvolley.toolbox.FileUtils;
 
 import java.io.IOException;
 import java.lang.reflect.Method;
+import java.text.DecimalFormat;
 import java.util.ArrayList;
 
 public class GalleryActivity extends AppCompatActivity implements View.OnClickListener {
@@ -139,7 +140,11 @@ public class GalleryActivity extends AppCompatActivity implements View.OnClickLi
                         , new ProgressListener() {
                             @Override
                             public void onProgress(long transferredBytes, long totalSize) {
-
+                                float num1 =  (float)transferredBytes / totalSize * 100;
+                                DecimalFormat fnum  =   new  DecimalFormat("##0.00");
+                                String   dd=fnum.format(num1);
+                                Toast.makeText(GalleryActivity.this, "正在下载...（"+dd+"%）", Toast.LENGTH_SHORT).show();
+                                L.i("下载进度==="+dd+"%");
                             }
                         }, new HttpCallback() {
                             @Override
